@@ -1,6 +1,6 @@
 # Python Code Runner Lite
 
-This is a Python code runner with a graphical user interface (GUI) built using the tkinter library. It allows you to write and execute Python code snippets and scripts. You can also interact with GPT-3.5 for code generation and debugging assistance. Additionally, it provides options for handling Excel/CSV files and listing existing Python scripts in your directory.
+This Python code runner with a graphical user interface (GUI) aims to mimic the behavior of Code Interpreter in GPT-4, where code execution happens in the background. Unlike GPT-4, this tool runs locally, and you need to manually copy any error prompts to the web version of ChatGPT for assistance.
 
 ## Table of Contents
 - [Features](#features)

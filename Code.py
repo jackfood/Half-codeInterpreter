@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext, Menu, Button, messagebox, simpledialog
+from tkinter import scrolledtext, Menu, Button, messagebox, simpledialog, filedialog
 import subprocess
 import os
 import threading
@@ -71,34 +71,54 @@ def list_python_scripts():
     copy_button.pack()
 
 def process_excel_csv_option():
-    input_location = simpledialog.askstring("Input Location", "Enter Excel/CSV input file location:")
+    input_location = filedialog.askopenfilename(title="Select Excel/CSV Input File", filetypes=[("Excel/CSV Files", "*.xlsx *.csv")])
     if not input_location:
         messagebox.showerror("Error", "Input location cannot be empty.")
         return
 
-    output_location = simpledialog.askstring("Output Location", "Enter Excel/CSV output file location:")
+    output_location = filedialog.askdirectory(title="Select Output Directory")
     if not output_location:
         messagebox.showerror("Error", "Output location cannot be empty.")
         return
 
     code = f'''
-You are code interpreter. you are required to find out more on the dataset and perform analytical reasoning by writing full python code on a given dataset via excel or csv or other format. You have to ensure you have enough information on the dataset, If yes, perform data cleaning of dataset using python. If not, write python to analyse further on the dataset. Whenever an error returns to you, you should perform what code interpret should perform, diagnosis and come up with alternative solutions. Or else, write or rewrite full python code without # or explanation.
+You are an expert Python developer with an AI interpreter called 'Code Interpreter.' You are ready to help me analyze Excel or csv data, or any other format and perform various data analysis and visualization tasks. You will respond with comprehensive high level Python code tailored to my needs, whether it's data exploration, cleaning, analysis, or finding the right dataset. You will avoid using comments (#) or explanations, providing me with clean and efficient code. 
+
+In each step below, you will write a python and until you have a clear understanding of the data then you are allowed to move to the next step. The flow as such,
+1. Explore the Data to get an initial understanding of my data.
+2. Checking and handle missing values by either removing rows/columns or imputing them with mean, median, mode, or custom values.
+3. Detect and handle duplicate data
+4. Correct data types and Rename columns for clarity if needed.
+5. Encode categorical variables using one-hot encoding or label encoding
+6. Scale or standardize numerical features if necessary 
+7. Create new features or derive insights from existing ones.
+
+With each step, rewrite python for importing necessary dependencies and the data file directory.
 The file is located in {input_location} and the save directory should be in {output_location}.
 '''
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
 
+def process_python_prompt_option():
+    code = f'''
+You are an expert Python developer. You are ready to help me create or debug a Python script. You will respond with comprehensive high level Python code tailored to my needs, with exceptional debugging skills. With request for adding features, you will try to minimize change to my original python code and without removing any of the functionality, unless i asked you to. You will avoid using comments (#) or explanations, providing me with clean and efficient code. You will reply with the whole python code in code block, and provide a overview of what you changed in code block.
+'''
+    code_entry.delete("1.0", tk.END)
+    code_entry.insert(tk.END, code)
+
+
+
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.0.2")
+root.title("Python Code Runner Lite v1.0.3")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)
 
 # Add "Excel/CSV Option" to the "Options" menu.
 menu_bar.add_command(label="Excel/CSV Option", command=process_excel_csv_option)
-
-# Add "List Python Scripts" to the "Scripts" menu.
 menu_bar.add_command(label="List Python Scripts", command=list_python_scripts)
+menu_bar.add_command(label="Python Prompt", command=process_python_prompt_option)
+
 
 code_label = tk.Label(root, text="Enter Python Code:")
 code_label.pack()

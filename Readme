@@ -1,0 +1,78 @@
+# Python Code Runner Lite
+
+This is a Python code runner with a graphical user interface (GUI) built using the tkinter library. It allows you to write and execute Python code snippets and scripts. You can also interact with GPT-3.5 for code generation and debugging assistance. Additionally, it provides options for handling Excel/CSV files and listing existing Python scripts in your directory.
+
+## Table of Contents
+- [Features](#features)
+- [Requirements](#requirements)
+- [Usage](#usage)
+  - [Executing Python Code](#executing-python-code)
+  - [Handling Excel/CSV Files](#handling-excelcsv-files)
+  - [Working with Python Prompts](#working-with-python-prompts)
+- [Auto Paste & Execute](#auto-paste--execute)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- **Execute Python Code:** Write and execute Python code snippets or scripts within the GUI.
+- **Interactive with ChatGPT:** Utilize the built-in interface with ChatGPT for code generation and debugging.
+- **Handle Excel/CSV Files:** Load and process Excel/CSV files, including data exploration and analysis.
+- **List Python Scripts:** View a list of Python scripts in your directory and select them for editing.
+- **Auto Paste & Execute:** Automatically paste code from the clipboard and execute it.
+
+## Requirements
+
+Before using this tool, ensure that you have the following installed:
+
+- Python 3.x
+- tkinter library (usually included in Python standard library)
+- pandas library (for Excel/CSV processing)
+- subprocess library (for running Python scripts)
+- matplotlib library (for data visualization)
+
+You can install the required Python libraries using pip:
+
+```bash
+pip install pandas matplotlib
+```
+
+## Usage
+
+### Executing Python Code
+
+1. Enter your Python code in the text area labeled "Enter Python Code."
+
+2. Click the "Save and Run Code" button to execute the code. The output will be displayed in the lower text area.
+
+3. If you want to interrupt the running code, click the "Save and Run Code" button again.
+
+### Handling Excel/CSV Files
+
+1. Click on the "Excel/CSV Option" in the "Options" menu.
+
+2. Select an Excel or CSV file when prompted.
+
+3. Select an output directory where the processed data or code will be saved.
+
+4. The code for handling Excel/CSV data will be automatically generated in the code entry area. You can modify it as needed.
+
+### Working with Python Prompts
+
+1. You can use the "Python Prompt" option in the "Options" menu to generate Python code prompts for various tasks.
+
+2. After selecting a prompt, the corresponding Python code will be generated in the code entry area. You can then execute it or modify it as needed.
+
+3. For specific prompts, such as "Analyse Excel Step 1," you will be prompted to select an Excel or CSV file. The code generated will be tailored to analyzing the selected data.
+
+## Auto Paste & Execute
+
+- Click the "Enable Auto Paste & Execute" button to enable automatic code pasting and execution.
+
+- When enabled, the tool will periodically check your clipboard for Python code. If it detects valid Python code in your clipboard, it will automatically paste and execute it.
+
+- To disable this feature, click the "Enable Auto Paste & Execute" button again.
+
+## Contributing
+
+If you would like to contribute to this project, please feel free to submit issues or pull requests on the GitHub repository.

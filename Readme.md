@@ -75,7 +75,7 @@ pip install pandas matplotlib
 
 - When enabled, the tool will periodically check your clipboard for Python code. If it detects the word 'import' in your clipboard, it will automatically paste and execute the code.
 
-- To disable this feature, click the "Enable Auto Paste & Execute" button again.
+- To disable this feature, click the "Disable Auto Paste & Execute" button.
 
 ## Running 'code.py'
 

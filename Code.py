@@ -26,7 +26,7 @@ def save_and_run_python_code():
     
     result_text.config(state=tk.NORMAL)
     result_text.delete("1.0", tk.END)
-    result_text.insert(tk.END, "Running the script...\n")
+    result_text.insert(tk.END, "..\n")
     result_text.config(state=tk.DISABLED)
 
     def update_result():
@@ -83,26 +83,75 @@ def process_excel_csv_option():
         return
 
     code = f'''
-You are an expert Python developer with an AI interpreter called 'Code Interpreter.' You are ready to help me analyze Excel or csv data, or any other format and perform various data analysis and visualization tasks. You will respond with comprehensive high level Python code tailored to my needs, whether it's data exploration, cleaning, analysis, or finding the right dataset. You will avoid using comments (#) or explanations, providing me with clean and efficient code. 
+You are an expert Python developer with an AI interpreter called 'Code Interpreter.' You are ready to help me analyze Excel or csv data, or any other format and perform various data analysis and visualization tasks. You will respond with comprehensive high level Python code tailored to my needs, whether it's data exploration, cleaning, analysis, or finding the right dataset. You will avoid using comments (#) or explanations, providing me with clean and efficient code. Always write the python as a whole and do not break up the code. Always provide import dependencies.
 
 In each step below, you will write a python and until you have a clear understanding of the data then you are allowed to move to the next step. The flow as such,
-1. Explore the Data to get an initial understanding of my data.
-2. Checking and handle missing values by either removing rows/columns or imputing them with mean, median, mode, or custom values.
-3. Detect and handle duplicate data
-4. Correct data types and Rename columns for clarity if needed.
-5. Encode categorical variables using one-hot encoding or label encoding
-6. Scale or standardize numerical features if necessary 
-7. Create new features or derive insights from existing ones.
+1. Explore the Data to get an initial understanding of my data. Including check the number of sheets and the name of the sheet, Detect and handle duplicate data
+2. Checking and handle missing values by either removing rows/columns or imputing them with mean, median, mode, or custom values. Correct data types and Rename columns for clarity if needed.
 
 With each step, rewrite python for importing necessary dependencies and the data file directory.
-The file is located in {input_location} and the save directory should be in {output_location}.
+The file is located in {input_location}. The output directory should be in {output_location} and only use this directory if needed.
 '''
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
+    result_text.config(state=tk.NORMAL)
+    result_text.delete("1.0", tk.END)
+    result_text.insert(tk.END, "Copy above prompt into ChatGPT\n")
+    result_text.config(state=tk.DISABLED)
 
 def process_python_prompt_option():
     code = f'''
 You are an expert Python developer. You are ready to help me create or debug a Python script. You will respond with comprehensive high level Python code tailored to my needs, with exceptional debugging skills. With request for adding features, you will try to minimize change to my original python code and without removing any of the functionality, unless i asked you to. You will avoid using comments (#) or explanations, providing me with clean and efficient code. You will reply with the whole python code in code block, and provide a overview of what you changed in code block.
+'''
+    code_entry.delete("1.0", tk.END)
+    code_entry.insert(tk.END, code)
+    result_text.config(state=tk.NORMAL)
+    result_text.delete("1.0", tk.END)
+    result_text.insert(tk.END, "Copy above python prompt into ChatGPT\n")
+    result_text.config(state=tk.DISABLED)
+
+def process_python_prompt_Analyse_S1():
+    input_location_2 = filedialog.askopenfilename(title="Select Excel/CSV Input File", filetypes=[("Excel/CSV Files", "*.xlsx *.csv")])
+    if not input_location_2:
+        messagebox.showerror("Error", "Input location cannot be empty.")
+        return
+
+    code = f'''
+import pandas as pd
+
+# Read the Excel file
+file_path = r"{input_location_2}"
+xls = pd.ExcelFile(file_path)
+sheet_names = xls.sheet_names
+
+# Set Pandas display options to show all columns
+pd.set_option('display.max_columns', None)
+
+for sheet_name in sheet_names:
+    print("Data Preview for -", sheet_name, ":")
+    data = pd.read_excel(xls, sheet_name)
+
+    # Print the first 3 rows of the dataset
+    data_preview = data.head(3)
+    print(data_preview)
+
+    print("Data Types of Columns:")
+    data_info = data.info()
+
+    # Numeric summary
+    numeric_summary = data.describe()
+
+    # Missing values count
+    missing_values_count = data.isna().sum()
+
+    # Print the data types, numeric summary, and missing values count
+    print(data_info)
+    print(numeric_summary)
+    print(missing_values_count)
+    print("-" * 50)  # Add a separator line for better readability between sheets
+
+
+
 '''
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
@@ -130,13 +179,13 @@ def auto_paste_and_execute():
                 if 'import matplotlib' in clipboard_content:
                     listening_clipboard = False
                     auto_paste_button.config(text="Enable Auto Paste & Execute")
-            root.after(2000, check_clipboard)
+            root.after(1000, check_clipboard)
 
     check_clipboard()
 
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.1")
+root.title("Python Code Runner Lite v1.1.1")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)
@@ -145,6 +194,8 @@ root.config(menu=menu_bar)
 menu_bar.add_command(label="Excel/CSV Option", command=process_excel_csv_option)
 menu_bar.add_command(label="List Python Scripts", command=list_python_scripts)
 menu_bar.add_command(label="Python Prompt", command=process_python_prompt_option)
+menu_bar.add_command(label="Anaylse Excel Step 1", command=process_python_prompt_Analyse_S1)
+
 
 code_label = tk.Label(root, text="Enter Python Code:")
 code_label.pack()

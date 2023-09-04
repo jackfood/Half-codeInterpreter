@@ -3,6 +3,8 @@
 This Python code runner (Half Code interpreter) with a graphical user interface (GUI) aims to mimic the behavior of Code Interpreter in GPT-4, where code execution happens locally. 
 Please note that for error prompt assistance, you must manually copy errors and use the web version of ChatGPT 3.5 Turbo (OpenAI account required).
 
+Certainly, I've updated the README to include running 'code.py' in a Python environment and highlighted the main feature of auto-listening to clipboard changes:
+
 ## Table of Contents
 - [Features](#features)
 - [Requirements](#requirements)
@@ -11,6 +13,7 @@ Please note that for error prompt assistance, you must manually copy errors and 
   - [Handling Excel/CSV Files](#handling-excelcsv-files)
   - [Working with Python Prompts](#working-with-python-prompts)
 - [Auto Paste & Execute](#auto-paste--execute)
+- [Running 'code.py'](#running-codepy)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -20,7 +23,7 @@ Please note that for error prompt assistance, you must manually copy errors and 
 - **Interactive with ChatGPT:** Utilize the built-in interface with ChatGPT for code generation and debugging. Please note that this tool does not execute code in the background like GPT-4; you must manually run the code.
 - **Handle Excel/CSV Data Analysis:** Simplify data analysis tasks for Excel and CSV files. Generate Python code snippets to assist in data exploration, cleaning, and analysis.
 - **List Python Scripts:** View a list of Python scripts in your directory and select them for editing.
-- **Auto Paste & Execute:** Automatically paste code from the clipboard and execute it.
+- **Auto Paste & Execute:** Automatically paste code from the clipboard and execute it when the word 'import' is detected.
 
 ## Requirements
 
@@ -70,9 +73,13 @@ pip install pandas matplotlib
 
 - Click the "Enable Auto Paste & Execute" button to enable automatic code pasting and execution.
 
-- When enabled, the tool will periodically check your clipboard for Python code. If it detects valid Python code in your clipboard, it will automatically paste and execute it.
+- When enabled, the tool will periodically check your clipboard for Python code. If it detects the word 'import' in your clipboard, it will automatically paste and execute the code.
 
 - To disable this feature, click the "Enable Auto Paste & Execute" button again.
+
+## Running 'code.py'
+
+After setting up the requirements, you can run the 'code.py' file in your Python environment to launch the Python Code Runner Lite.
 
 ## Contributing
 

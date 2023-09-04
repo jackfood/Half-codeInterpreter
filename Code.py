@@ -7,6 +7,7 @@ import time
 
 running_process = None
 last_code = ""
+listening_clipboard = False
 
 def save_and_run_python_code():
     global last_code, running_process
@@ -106,10 +107,36 @@ You are an expert Python developer. You are ready to help me create or debug a P
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
 
+def auto_paste_and_execute():
+    global listening_clipboard
+    listening_clipboard = not listening_clipboard
+    if listening_clipboard:
+        auto_paste_button.config(text="Disable Auto Paste & Execute")
+    else:
+        auto_paste_button.config(text="Enable Auto Paste & Execute")
+
+    clipboard_content = ""
+
+    def check_clipboard():
+        nonlocal clipboard_content
+        global listening_clipboard  # Add this line to access the global variable
+        if listening_clipboard:
+            new_content = root.clipboard_get()
+            if new_content != clipboard_content and 'import' in new_content:
+                clipboard_content = new_content
+                code_entry.delete("1.0", tk.END)
+                code_entry.insert(tk.END, clipboard_content)
+                save_and_run_python_code()
+                if 'import matplotlib' in clipboard_content:
+                    listening_clipboard = False
+                    auto_paste_button.config(text="Enable Auto Paste & Execute")
+            root.after(2000, check_clipboard)
+
+    check_clipboard()
 
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.0.3")
+root.title("Python Code Runner Lite v1.1")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)
@@ -118,7 +145,6 @@ root.config(menu=menu_bar)
 menu_bar.add_command(label="Excel/CSV Option", command=process_excel_csv_option)
 menu_bar.add_command(label="List Python Scripts", command=list_python_scripts)
 menu_bar.add_command(label="Python Prompt", command=process_python_prompt_option)
-
 
 code_label = tk.Label(root, text="Enter Python Code:")
 code_label.pack()
@@ -131,6 +157,9 @@ code_entry.pack(fill=tk.BOTH, expand=True)
 
 save_and_run_button = tk.Button(root, text="Save and Run Code", command=save_and_run_python_code)
 save_and_run_button.pack()
+
+auto_paste_button = tk.Button(root, text="Enable Auto Paste & Execute", command=auto_paste_and_execute)
+auto_paste_button.pack()
 
 result_text = scrolledtext.ScrolledText(root, height=10, width=40, bg="black", fg="white")
 result_text.pack(fill=tk.BOTH, expand=True)

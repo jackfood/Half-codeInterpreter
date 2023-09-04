@@ -1,6 +1,7 @@
-# Python Code Runner Lite
+# Python Code Runner Lite (Half Code interpreter) for Data Analysis
 
-This Python code runner with a graphical user interface (GUI) aims to mimic the behavior of Code Interpreter in GPT-4, where code execution happens in the background. Unlike GPT-4, this tool runs locally, and you need to manually copy any error prompts to the web version of ChatGPT for assistance.
+This Python code runner (Half Code interpreter) with a graphical user interface (GUI) aims to mimic the behavior of Code Interpreter in GPT-4, where code execution happens locally. 
+Please note that for error prompt assistance, you must manually copy errors and use the web version of ChatGPT 3.5 Turbo (OpenAI account required).
 
 ## Table of Contents
 - [Features](#features)
@@ -16,8 +17,8 @@ This Python code runner with a graphical user interface (GUI) aims to mimic the 
 ## Features
 
 - **Execute Python Code:** Write and execute Python code snippets or scripts within the GUI.
-- **Interactive with ChatGPT:** Utilize the built-in interface with ChatGPT for code generation and debugging.
-- **Handle Excel/CSV Files:** Load and process Excel/CSV files, including data exploration and analysis.
+- **Interactive with ChatGPT:** Utilize the built-in interface with ChatGPT for code generation and debugging. Please note that this tool does not execute code in the background like GPT-4; you must manually run the code.
+- **Handle Excel/CSV Data Analysis:** Simplify data analysis tasks for Excel and CSV files. Generate Python code snippets to assist in data exploration, cleaning, and analysis.
 - **List Python Scripts:** View a list of Python scripts in your directory and select them for editing.
 - **Auto Paste & Execute:** Automatically paste code from the clipboard and execute it.
 
@@ -45,7 +46,7 @@ pip install pandas matplotlib
 
 2. Click the "Save and Run Code" button to execute the code. The output will be displayed in the lower text area.
 
-3. If you want to interrupt the running code, click the "Save and Run Code" button again.
+3. If an error occurs during code execution, manually copy the error message and seek assistance in the web version of ChatGPT 3.5 Turbo (OpenAI account required).
 
 ### Handling Excel/CSV Files
 

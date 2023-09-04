@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext, Menu, Button, messagebox
+from tkinter import scrolledtext, Menu, Button, messagebox, simpledialog
 import subprocess
 import os
 import threading
@@ -60,6 +60,9 @@ def list_python_scripts():
             with open(selected_script, 'r') as file:
                 script_content = file.read()
 
+            code_entry.delete("1.0", tk.END)
+            code_entry.insert(tk.END, script_content)  # Paste the script into the code entry window
+
             root.clipboard_clear()
             root.clipboard_append(script_content)
             scripts_window.destroy()
@@ -67,15 +70,35 @@ def list_python_scripts():
     copy_button = tk.Button(scripts_window, text="Copy Script to Clipboard", command=on_script_selected)
     copy_button.pack()
 
+def process_excel_csv_option():
+    input_location = simpledialog.askstring("Input Location", "Enter Excel/CSV input file location:")
+    if not input_location:
+        messagebox.showerror("Error", "Input location cannot be empty.")
+        return
+
+    output_location = simpledialog.askstring("Output Location", "Enter Excel/CSV output file location:")
+    if not output_location:
+        messagebox.showerror("Error", "Output location cannot be empty.")
+        return
+
+    code = f'''
+You are code interpreter. you are required to find out more on the dataset and perform analytical reasoning by writing full python code on a given dataset via excel or csv or other format. You have to ensure you have enough information on the dataset, If yes, perform data cleaning of dataset using python. If not, write python to analyse further on the dataset. Whenever an error returns to you, you should perform what code interpret should perform, diagnosis and come up with alternative solutions. Or else, write or rewrite full python code without # or explanation.
+The file is located in {input_location} and the save directory should be in {output_location}.
+'''
+    code_entry.delete("1.0", tk.END)
+    code_entry.insert(tk.END, code)
+
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.0")
+root.title("Python Code Runner Lite v1.0.2")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)
 
-scripts_menu = Menu(menu_bar)
-menu_bar.add_cascade(label="Scripts", menu=scripts_menu)
-scripts_menu.add_command(label="List Python Scripts", command=list_python_scripts)
+# Add "Excel/CSV Option" to the "Options" menu.
+menu_bar.add_command(label="Excel/CSV Option", command=process_excel_csv_option)
+
+# Add "List Python Scripts" to the "Scripts" menu.
+menu_bar.add_command(label="List Python Scripts", command=list_python_scripts)
 
 code_label = tk.Label(root, text="Enter Python Code:")
 code_label.pack()

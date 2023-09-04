@@ -1,7 +1,7 @@
 # Python Code Runner Lite (Half Code interpreter) for Data Analysis
 
 This Python code runner (Half Code interpreter) with a graphical user interface (GUI) aims to mimic the behavior of Code Interpreter in GPT-4, where code execution happens locally. 
-Please note that for error prompt assistance, you must manually copy errors and use the web version of ChatGPT 3.5 Turbo (OpenAI account required).
+Please note that for error prompt assistance after execute the code, you must manually copy errors and use the web version of ChatGPT 3.5 Turbo (OpenAI account required) for debugging.
 
 Certainly, I've updated the README to include running 'code.py' in a Python environment and highlighted the main feature of auto-listening to clipboard changes:
 
@@ -73,7 +73,7 @@ pip install pandas matplotlib
 
 - Click the "Enable Auto Paste & Execute" button to enable automatic code pasting and execution.
 
-- When enabled, the tool will periodically check your clipboard for Python code. If it detects the word 'import' in your clipboard, it will automatically paste and execute the code.
+- When enabled, the tool will periodically (every 2 seconds) check your clipboard for Python code. If it detects the word 'import' in your clipboard, it will automatically paste and execute the code. It also compares whether the data in the existing python code input area is the same as the clipboard data. If it is the same, it will prevent copying and execute the code to prevent duplicate running of the code every 2 seconds, afterwhich, it will continue to listen until user clicked on the "Disable Auto Paste & Execute" button.
 
 - To disable this feature, click the "Disable Auto Paste & Execute" button.
 

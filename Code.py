@@ -30,6 +30,7 @@ def save_and_run_python_code():
     result_text.config(state=tk.DISABLED)
 
     def update_result():
+        error_found = False  # Flag to check if 'error' is found in the output
         while True:
             output = running_process.stdout.readline()
             if output == '' and running_process.poll() is not None:
@@ -39,7 +40,15 @@ def save_and_run_python_code():
                 result_text.insert(tk.END, output)
                 result_text.config(state=tk.DISABLED)
                 result_text.see(tk.END)
+                if 'error' in output.lower():  # Check if 'error' is present in the output
+                    error_found = True
             time.sleep(0.1)
+
+        if error_found:
+            # If 'error' was found, copy the entire result_text to the clipboard
+            root.clipboard_clear()
+            root.clipboard_append(result_text.get("1.0", tk.END))
+            root.update()  # Update the clipboard
 
     update_result_thread = threading.Thread(target=update_result)
     update_result_thread.start()
@@ -185,7 +194,7 @@ def auto_paste_and_execute():
 
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.1.1")
+root.title("Python Code Runner Lite v1.1.2")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)

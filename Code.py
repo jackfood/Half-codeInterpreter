@@ -4,6 +4,7 @@ import subprocess
 import os
 import threading
 import time
+import pyautogui
 
 running_process = None
 last_code = ""
@@ -49,6 +50,8 @@ def save_and_run_python_code():
             root.clipboard_clear()
             root.clipboard_append(result_text.get("1.0", tk.END))
             root.update()  # Update the clipboard
+            root.after(1000, lambda: pyautogui.hotkey('ctrl', 'v'))
+            root.after(1500, lambda: pyautogui.press('enter'))
 
     update_result_thread = threading.Thread(target=update_result)
     update_result_thread.start()
@@ -159,8 +162,6 @@ for sheet_name in sheet_names:
     print(missing_values_count)
     print("-" * 50)  # Add a separator line for better readability between sheets
 
-
-
 '''
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
@@ -194,7 +195,7 @@ def auto_paste_and_execute():
 
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.1.2")
+root.title("Python Code Runner Lite v1.1.3")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)

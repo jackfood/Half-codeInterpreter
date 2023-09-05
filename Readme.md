@@ -49,7 +49,7 @@ pip install pandas matplotlib
 
 2. Click the "Save and Run Code" button to execute the code. The output will be displayed in the lower text area.
 
-3. If an error occurs during code execution, manually copy the error message and seek assistance in the web version of ChatGPT 3.5 Turbo (OpenAI account required).
+3. If an error occurs during code execution, the error message will be automatically copied to the clipboard for your convenience. Seek assistance in the web version of ChatGPT 3.5 Turbo (OpenAI account required) by pasting the error.
 
 ### Handling Excel/CSV Files
 

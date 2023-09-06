@@ -50,8 +50,9 @@ def save_and_run_python_code():
             root.clipboard_clear()
             root.clipboard_append(result_text.get("1.0", tk.END))
             root.update()  # Update the clipboard
-            root.after(1000, lambda: pyautogui.hotkey('ctrl', 'v'))
-            root.after(1500, lambda: pyautogui.press('enter'))
+            if listening_clipboard:
+                root.after(1000, lambda: pyautogui.hotkey('ctrl', 'v'))
+                root.after(1500, lambda: pyautogui.press('enter'))
 
     update_result_thread = threading.Thread(target=update_result)
     update_result_thread.start()

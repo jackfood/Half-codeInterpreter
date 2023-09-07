@@ -95,21 +95,15 @@ def process_excel_csv_option():
         messagebox.showerror("Error", "Output location cannot be empty.")
         return
 
-    code = f'''
-You are an expert Python developer with an AI interpreter called 'Code Interpreter.' You are ready to help me analyze Excel or csv data, or any other format and perform various data analysis and visualization tasks. You will respond with comprehensive high level Python code tailored to my needs, whether it's data exploration, cleaning, analysis, or finding the right dataset. You will avoid using comments (#) or explanations, providing me with clean and efficient code. Always write the python as a whole and do not break up the code. Always provide import dependencies.
-
-In each step below, you will write a python and until you have a clear understanding of the data then you are allowed to move to the next step. The flow as such,
-1. Explore the Data to get an initial understanding of my data. Including check the number of sheets and the name of the sheet, Detect and handle duplicate data
-2. Checking and handle missing values by either removing rows/columns or imputing them with mean, median, mode, or custom values. Correct data types and Rename columns for clarity if needed.
+    code = f'''You are a data analysis and Python expert. This is an example data. Please learn to understand the structure and content of this data. Explain meaning and function of each columns, give simple and clear explanation of the technical terms. Please analuysis options, please think step by step. 
 
 With each step, rewrite python for importing necessary dependencies and the data file directory.
-The file is located in {input_location}. The output directory should be in {output_location} and only use this directory if needed.
-'''
+The file is located in {input_location}. The output directory should be in {output_location} and only use this directory if needed.'''
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
     result_text.config(state=tk.NORMAL)
     result_text.delete("1.0", tk.END)
-    result_text.insert(tk.END, "Copy above prompt into ChatGPT\n")
+    result_text.insert(tk.END, "Paste prompt into ChatGPT\n")
     result_text.config(state=tk.DISABLED)
 
 def process_python_prompt_option():
@@ -161,11 +155,11 @@ for sheet_name in sheet_names:
     print(data_info)
     print(numeric_summary)
     print(missing_values_count)
-    print("-" * 50)  # Add a separator line for better readability between sheets
-
-'''
+    print("-" * 50)  # Add a separator line for better readability between sheets'''
+    
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
+    save_and_run_python_code()
 
 def auto_paste_and_execute():
     global listening_clipboard
@@ -196,7 +190,7 @@ def auto_paste_and_execute():
 
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.1.3")
+root.title("Python Code Runner Lite v1.1.5")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)

@@ -95,7 +95,7 @@ def process_excel_csv_option():
         messagebox.showerror("Error", "Output location cannot be empty.")
         return
 
-    code = f'''You are a data analysis and Python expert. This is an example data. Please learn to understand the structure and content of this data. Explain meaning and function of each columns, give simple and clear explanation of the technical terms. Please analuysis options, please think step by step. 
+    code = f'''You are a data analysis and Python expert. This is an example data. Please learn to understand the structure and content of this data. Explain meaning and function of each columns, give simple and clear explanation of the technical terms. Please analysis options, please think step by step. 
 
 With each step, rewrite python for importing necessary dependencies and the data file directory.
 The file is located in {input_location}. The output directory should be in {output_location} and only use this directory if needed.'''
@@ -107,9 +107,7 @@ The file is located in {input_location}. The output directory should be in {outp
     result_text.config(state=tk.DISABLED)
 
 def process_python_prompt_option():
-    code = f'''
-You are an expert Python developer. You are ready to help me create or debug a Python script. You will respond with comprehensive high level Python code tailored to my needs, with exceptional debugging skills. With request for adding features, you will try to minimize change to my original python code and without removing any of the functionality, unless i asked you to. You will avoid using comments (#) or explanations, providing me with clean and efficient code. You will reply with the whole python code in code block, and provide a overview of what you changed in code block.
-'''
+    code = f'''You are an expert Python developer. You are ready to help me create or debug a Python script. You will respond with comprehensive high level Python code tailored to my needs, with exceptional debugging skills. With request for adding features, you will try to minimize change to my original python code and without removing any of the functionality, unless i asked you to. You will avoid using comments (#) or explanations, providing me with clean and efficient code. You will reply with the whole python code in code block, and provide a overview of what you changed in code block.'''
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
     result_text.config(state=tk.NORMAL)

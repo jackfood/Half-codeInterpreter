@@ -10,6 +10,15 @@ running_process = None
 last_code = ""
 listening_clipboard = False
 
+with open('.env', 'r') as env_file:
+    env_content = env_file.read()
+    env_variables = {}
+    exec(env_content, env_variables)
+excel_csv_prompt = env_variables['excel_csv_prompt']
+python_prompt = env_variables['python_prompt']
+data_analyse_prompt = env_variables['data_analyse_prompt']
+
+
 def save_and_run_python_code():
     global last_code, running_process
     code = code_entry.get("1.0", "end-1c")
@@ -95,10 +104,9 @@ def process_excel_csv_option():
         messagebox.showerror("Error", "Output location cannot be empty.")
         return
 
-    code = f'''You are a data analysis and Python expert. This is an example data. Please learn to understand the structure and content of this data. Explain meaning and function of each columns, give simple and clear explanation of the technical terms. Please analysis options, please think step by step. 
-
-With each step, rewrite python for importing necessary dependencies and the data file directory.
-The file is located in {input_location}. The output directory should be in {output_location} and only use this directory if needed.'''
+    code = f'''{excel_csv_prompt}
+Excel file: {input_location}
+Save to directory if needed: {output_location}'''
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
     result_text.config(state=tk.NORMAL)
@@ -107,7 +115,7 @@ The file is located in {input_location}. The output directory should be in {outp
     result_text.config(state=tk.DISABLED)
 
 def process_python_prompt_option():
-    code = f'''You are an expert Python developer. You are ready to help me create or debug a Python script. You will respond with comprehensive high level Python code tailored to my needs, with exceptional debugging skills. With request for adding features, you will try to minimize change to my original python code and without removing any of the functionality, unless i asked you to. You will avoid using comments (#) or explanations, providing me with clean and efficient code. You will reply with the whole python code in code block, and provide a overview of what you changed in code block.'''
+    code = f'''{python_prompt}'''
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
     result_text.config(state=tk.NORMAL)
@@ -121,39 +129,7 @@ def process_python_prompt_Analyse_S1():
         messagebox.showerror("Error", "Input location cannot be empty.")
         return
 
-    code = f'''
-import pandas as pd
-
-# Read the Excel file
-file_path = r"{input_location_2}"
-xls = pd.ExcelFile(file_path)
-sheet_names = xls.sheet_names
-
-# Set Pandas display options to show all columns
-pd.set_option('display.max_columns', None)
-
-for sheet_name in sheet_names:
-    print("Data Preview for -", sheet_name, ":")
-    data = pd.read_excel(xls, sheet_name)
-
-    # Print the first 3 rows of the dataset
-    data_preview = data.head(3)
-    print(data_preview)
-
-    print("Data Types of Columns:")
-    data_info = data.info()
-
-    # Numeric summary
-    numeric_summary = data.describe()
-
-    # Missing values count
-    missing_values_count = data.isna().sum()
-
-    # Print the data types, numeric summary, and missing values count
-    print(data_info)
-    print(numeric_summary)
-    print(missing_values_count)
-    print("-" * 50)  # Add a separator line for better readability between sheets'''
+    code = f'''{data_analyse_prompt}'''
     
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
@@ -188,7 +164,7 @@ def auto_paste_and_execute():
 
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.1.5")
+root.title("Python Code Runner Lite v1.1.6")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)

@@ -10,6 +10,7 @@ running_process = None
 last_code = ""
 listening_clipboard = False
 
+# Load environment variables from .env file
 with open('.env', 'r') as env_file:
     env_content = env_file.read()
     env_variables = {}
@@ -17,7 +18,13 @@ with open('.env', 'r') as env_file:
 excel_csv_prompt = env_variables['excel_csv_prompt']
 python_prompt = env_variables['python_prompt']
 data_analyse_prompt = env_variables['data_analyse_prompt']
+chain_of_thought = env_variables['chain_of_thought']
 
+def update_result_text(message, state):
+    result_text.config(state=tk.NORMAL)
+    result_text.delete("1.0", tk.END)
+    result_text.insert(tk.END, message)
+    result_text.config(state=state)
 
 def save_and_run_python_code():
     global last_code, running_process
@@ -34,13 +41,10 @@ def save_and_run_python_code():
     running_process = subprocess.Popen(
         command, cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
     
-    result_text.config(state=tk.NORMAL)
-    result_text.delete("1.0", tk.END)
-    result_text.insert(tk.END, "..\n")
-    result_text.config(state=tk.DISABLED)
+    update_result_text("..\n", tk.DISABLED)
 
     def update_result():
-        error_found = False  # Flag to check if 'error' is found in the output
+        error_found = False
         while True:
             output = running_process.stdout.readline()
             if output == '' and running_process.poll() is not None:
@@ -50,15 +54,14 @@ def save_and_run_python_code():
                 result_text.insert(tk.END, output)
                 result_text.config(state=tk.DISABLED)
                 result_text.see(tk.END)
-                if 'error' in output.lower():  # Check if 'error' is present in the output
+                if 'error' in output.lower():
                     error_found = True
             time.sleep(0.1)
 
         if error_found:
-            # If 'error' was found, copy the entire result_text to the clipboard
             root.clipboard_clear()
             root.clipboard_append(result_text.get("1.0", tk.END))
-            root.update()  # Update the clipboard
+            root.update()
             if listening_clipboard:
                 root.after(1000, lambda: pyautogui.hotkey('ctrl', 'v'))
                 root.after(1500, lambda: pyautogui.press('enter'))
@@ -84,7 +87,7 @@ def list_python_scripts():
                 script_content = file.read()
 
             code_entry.delete("1.0", tk.END)
-            code_entry.insert(tk.END, script_content)  # Paste the script into the code entry window
+            code_entry.insert(tk.END, script_content)
 
             root.clipboard_clear()
             root.clipboard_append(script_content)
@@ -107,21 +110,27 @@ def process_excel_csv_option():
     code = f'''{excel_csv_prompt}
 Excel file: {input_location}
 Save to directory if needed: {output_location}'''
+
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
-    result_text.config(state=tk.NORMAL)
-    result_text.delete("1.0", tk.END)
-    result_text.insert(tk.END, "Paste prompt into ChatGPT\n")
-    result_text.config(state=tk.DISABLED)
+    update_result_text("Paste prompt into ChatGPT\n", tk.DISABLED)
+
+def process_chain_of_thought():
+    question_COT = simpledialog.askstring("Enter Your Question", "Enter Your Question:", parent=root)
+    if question_COT is not None:
+        code = f'''{chain_of_thought} {question_COT}'''
+        code_entry.delete("1.0", tk.END)
+        code_entry.insert(tk.END, code)
+        update_result_text("Copy above python prompt into ChatGPT\n", tk.DISABLED)
+
+    # Bind Enter key to trigger 'OK' button
+    root.bind('<Return>', lambda event=None: root.focus_force())
 
 def process_python_prompt_option():
     code = f'''{python_prompt}'''
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
-    result_text.config(state=tk.NORMAL)
-    result_text.delete("1.0", tk.END)
-    result_text.insert(tk.END, "Copy above python prompt into ChatGPT\n")
-    result_text.config(state=tk.DISABLED)
+    update_result_text("Copy above python prompt into ChatGPT\n", tk.DISABLED)
 
 def process_python_prompt_Analyse_S1():
     input_location_2 = filedialog.askopenfilename(title="Select Excel/CSV Input File", filetypes=[("Excel/CSV Files", "*.xlsx *.csv")])
@@ -129,7 +138,10 @@ def process_python_prompt_Analyse_S1():
         messagebox.showerror("Error", "Input location cannot be empty.")
         return
 
-    code = f'''{data_analyse_prompt}'''
+    code = f'''import pandas as pd
+import os
+file_path = r"{input_location_2}"
+{data_analyse_prompt}'''
     
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
@@ -147,7 +159,7 @@ def auto_paste_and_execute():
 
     def check_clipboard():
         nonlocal clipboard_content
-        global listening_clipboard  # Add this line to access the global variable
+        global listening_clipboard
         if listening_clipboard:
             new_content = root.clipboard_get()
             if new_content != clipboard_content and 'import' in new_content:
@@ -162,19 +174,23 @@ def auto_paste_and_execute():
 
     check_clipboard()
 
-
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.1.6")
+root.title("Python Code Runner Lite v1.1.7")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)
 
-# Add "Excel/CSV Option" to the "Options" menu.
-menu_bar.add_command(label="Excel/CSV Option", command=process_excel_csv_option)
-menu_bar.add_command(label="List Python Scripts", command=list_python_scripts)
-menu_bar.add_command(label="Python Prompt", command=process_python_prompt_option)
-menu_bar.add_command(label="Anaylse Excel Step 1", command=process_python_prompt_Analyse_S1)
+analysis_menu = Menu(menu_bar)
+menu_bar.add_cascade(label="Analysis Options", menu=analysis_menu)
+analysis_menu.add_command(label="Excel/CSV Option", command=process_excel_csv_option)
+analysis_menu.add_command(label="Analyse Excel Step 1", command=process_python_prompt_Analyse_S1)
 
+menu_bar.add_command(label="List Python Scripts", command=list_python_scripts)
+
+python_prompt_menu = Menu(menu_bar)
+menu_bar.add_cascade(label="Python Prompts", menu=python_prompt_menu)
+python_prompt_menu.add_command(label="Chain of Thought", command=process_chain_of_thought)
+python_prompt_menu.add_command(label="Python Prompt", command=process_python_prompt_option)
 
 code_label = tk.Label(root, text="Enter Python Code:")
 code_label.pack()

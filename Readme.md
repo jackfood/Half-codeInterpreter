@@ -38,7 +38,7 @@ Before using this tool, ensure that you have the following installed:
 You can install the required Python libraries using pip:
 
 ```bash
-pip install pandas matplotlib
+pip install -r requirements.txt
 ```
 
 ## Usage

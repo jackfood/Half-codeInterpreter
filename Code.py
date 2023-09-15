@@ -10,8 +10,9 @@ running_process = None
 last_code = ""
 listening_clipboard = False
 
-# Load environment variables from .env file
-with open('.env', 'r') as env_file:
+
+# Load environment variables from .env2 file
+with open('.env2', 'r') as env_file:
     env_content = env_file.read()
     env_variables = {}
     exec(env_content, env_variables)
@@ -19,6 +20,12 @@ excel_csv_prompt = env_variables['excel_csv_prompt']
 python_prompt = env_variables['python_prompt']
 data_analyse_prompt = env_variables['data_analyse_prompt']
 chain_of_thought = env_variables['chain_of_thought']
+checkeng_prompt = env_variables['checkeng_prompt']
+visualization_mermaid = env_variables['visualization_mermaid']
+python_optimise_prompt = env_variables['python_optimise_prompt']
+# = env_variables['']
+# = env_variables['']
+
 
 def update_result_text(message, state):
     result_text.config(state=tk.NORMAL)
@@ -110,42 +117,58 @@ def process_excel_csv_option():
     code = f'''{excel_csv_prompt}
 Excel file: {input_location}
 Save to directory if needed: {output_location}'''
-
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
-    update_result_text("Paste prompt into ChatGPT\n", tk.DISABLED)
+    update_result_text("Copy above python prompt into ChatGPT\n", tk.DISABLED)
+
+# Add insert code function ####################
+def insert_code_into_entry(code):
+    code_entry.delete("1.0", tk.END)
+    code_entry.insert(tk.END, code)
+    update_result_text("Copy above python prompt into ChatGPT\n", tk.DISABLED)
 
 def process_chain_of_thought():
     question_COT = simpledialog.askstring("Enter Your Question", "Enter Your Question:", parent=root)
     if question_COT is not None:
         code = f'''{chain_of_thought} {question_COT}'''
-        code_entry.delete("1.0", tk.END)
-        code_entry.insert(tk.END, code)
-        update_result_text("Copy above python prompt into ChatGPT\n", tk.DISABLED)
+        insert_code_into_entry(code)
 
     # Bind Enter key to trigger 'OK' button
     root.bind('<Return>', lambda event=None: root.focus_force())
 
 def process_python_prompt_option():
     code = f'''{python_prompt}'''
-    code_entry.delete("1.0", tk.END)
-    code_entry.insert(tk.END, code)
-    update_result_text("Copy above python prompt into ChatGPT\n", tk.DISABLED)
+    insert_code_into_entry(code)
+
+def process_checkeng_prompt_option():
+    code = f'''{checkeng_prompt}'''
+    insert_code_into_entry(code)
+
+def process_visualization_mermaid():
+    code = f'''{visualization_mermaid}'''
+    insert_code_into_entry(code)
+
+def process_pyoptimise():
+    code = f'''{python_optimise_prompt}'''
+    insert_code_into_entry(code)
 
 def process_python_prompt_Analyse_S1():
-    input_location_2 = filedialog.askopenfilename(title="Select Excel/CSV Input File", filetypes=[("Excel/CSV Files", "*.xlsx *.csv")])
+    input_location_2 = filedialog.askopenfilename(title="Select Excel/CSV Input File", filetypes=[("Excel Files", "*.xlsx"), ("CSV Files", "*.csv")])
     if not input_location_2:
         messagebox.showerror("Error", "Input location cannot be empty.")
         return
 
-    code = f'''import pandas as pd
-import os
+    code = f'''
+import pandas as pd
+
 file_path = r"{input_location_2}"
-{data_analyse_prompt}'''
-    
+{data_analyse_prompt}
+'''
+
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
     save_and_run_python_code()
+
 
 def auto_paste_and_execute():
     global listening_clipboard
@@ -174,23 +197,150 @@ def auto_paste_and_execute():
 
     check_clipboard()
 
+def process_python_prompt_Analyse_S2():
+    plot_types = [
+        "----Select a plot----",
+        "Plot Chart",
+        "Pie chart",
+        "linestyle chart using (-), with butt capstyle",
+        "linestyle chart using (-), with round capstyle",
+        "linestyle chart using (-), with projecting capstyle",
+        "linestyle chart using (!)",
+        "linestyle chart using (--) chart",
+        "linestyle chart using (0, 0.1, 2) chart",
+        "Scatter chart",
+        "bar chart",
+        "imshow - heatmap chart",
+        "contour chart",
+        "pcolormesh chart",
+        "quiver chart",
+        "text chart",
+        "fill_between chart",
+        "step chart",
+        "box plot chart",
+        "errorbar chart",
+        "histogram chart",
+        "violinplot chart",
+        "barbs chart",
+        "eventplot chart",
+        "hexbin chart",
+        "linear scale chart",
+        "log chart",
+        "symlog chart",
+        "logit chart",
+        "subplot chart"
+    ]
+
+
+    colour_type = [
+        "Appropriate colours",
+        "Black",
+        "Red",
+        "Blue",
+        "Green",
+        "Cyan",
+        "Magenta",
+        "Yellow",
+        "White",
+        "Purple",
+        "Brown",
+        "Orange",
+        "Pink",
+        "Olive",
+        "Teal",
+        "Lavender",
+        "Maroon",
+        "Navy",
+        "Turquoise",
+        "Gold",
+        "Indigo"
+    ]
+
+    colour_scheme = [
+        "no colour scheme",
+        "appropriate colour scheme",
+        "-----ColourMaps-----",
+        "Uniform - viridis",
+        "Uniform - magma",
+        "Uniform - plasma",
+        "Sequential - grey",
+        "Sequential - YlorBr",
+        "Sequential - Wistia",
+        "Diverging - Spectral",
+        "Diverging - Coolwarm",
+        "Diverging - RdGy",
+        "Qualitative - tab10",
+        "Qualitative - tab20",
+        "Cyclic - twlight",
+    ]
+
+    selected_plot = tk.StringVar(root)
+    selected_plot.set(plot_types[0])  # Set the initial value
+    selected_color_scheme = tk.StringVar(root)
+    selected_color_scheme.set(colour_scheme[0])
+    selected_color_type = tk.StringVar(root)
+    selected_color_type.set(colour_type[0])
+
+    # Create the OptionMenu with plot types
+    plot_type_menu = tk.OptionMenu(root, selected_plot, *plot_types)
+    color_scheme_menu = tk.OptionMenu(root, selected_color_scheme, *colour_scheme)
+    color_type_menu = tk.OptionMenu(root, selected_color_type, *colour_type)
+
+    plot_type_menu.pack()
+    color_scheme_menu.pack()
+    color_type_menu.pack()
+
+    def open_dialogs():
+        # Function to open input dialogs after plot type selection
+        headers_vis = simpledialog.askstring("Type of Variables", "Name your variable for correlation, write as 'name of header 1' and 'name of header 2'", parent=root)
+        title_vis = simpledialog.askstring("Title of chart", "Specify Name of title", parent=root)
+
+        code = f'''I want you to act as a data scientist coding in Python strictly without explanation and #. Given the provided dataframe containing the columns, use matplotlib to plot a ({selected_plot.get()}) to visualize the variables ({headers_vis}). Insert title as ({title_vis}). Set the color theme ({selected_color_scheme.get()}) using the main colour as light ({selected_color_type.get()}). Please include the file directory for df in python code block.'''
+
+
+        insert_code_into_entry(code)
+        plot_type_menu.pack_forget()
+        color_scheme_menu.pack_forget()
+        color_type_menu.pack_forget()
+        confirm_button.pack_forget()
+
+    # Create a button to trigger the input dialogs
+    confirm_button = tk.Button(root, text="Confirm", command=open_dialogs)
+    confirm_button.pack()
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.1.7")
+root.title("Python Code Runner Lite v1.2")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)
 
+# Create and configure menu
 analysis_menu = Menu(menu_bar)
-menu_bar.add_cascade(label="Analysis Options", menu=analysis_menu)
-analysis_menu.add_command(label="Excel/CSV Option", command=process_excel_csv_option)
-analysis_menu.add_command(label="Analyse Excel Step 1", command=process_python_prompt_Analyse_S1)
+menu_bar.add_cascade(label="Analysis Workflow", menu=analysis_menu)
+analysis_menu.add_command(label="Step 1 - Define Directory", command=process_excel_csv_option)
+analysis_menu.add_command(label="Step 2 - Provide Analyse Info", command=process_python_prompt_Analyse_S1)
+analysis_menu.add_command(label="Step 3 - Visualization using Malplotlib", command=process_python_prompt_Analyse_S2)
 
+# Add a command directly to the menu_bar
 menu_bar.add_command(label="List Python Scripts", command=list_python_scripts)
 
+# Create and configure menu
+gpt_prompt_menu = Menu(menu_bar)
+menu_bar.add_cascade(label="ChatGPT prompts", menu=gpt_prompt_menu)
+gpt_prompt_menu.add_command(label="English Check", command=process_checkeng_prompt_option)
+# gpt_prompt_menu.add_command(label="", command=)
+# gpt_prompt_menu.add_command(label="", command=)
+# gpt_prompt_menu.add_command(label="", command=)
+# gpt_prompt_menu.add_command(label="", command=)
+
+
+# Create and configure menu
 python_prompt_menu = Menu(menu_bar)
 menu_bar.add_cascade(label="Python Prompts", menu=python_prompt_menu)
-python_prompt_menu.add_command(label="Chain of Thought", command=process_chain_of_thought)
 python_prompt_menu.add_command(label="Python Prompt", command=process_python_prompt_option)
+python_prompt_menu.add_command(label="Python Code Optimization", command=process_pyoptimise)
+python_prompt_menu.add_command(label="Mermaid Flow Diagram Prompt", command=process_visualization_mermaid)
+#python_prompt_menu.add_command(label="", command=)
+
 
 code_label = tk.Label(root, text="Enter Python Code:")
 code_label.pack()

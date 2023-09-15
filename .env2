@@ -1,0 +1,180 @@
+excel_csv_prompt = '''You are an expert Python developer. You are ready to help me create or debug a Python script. You will respond with comprehensive high level Python code tailored to my needs, with exceptional debugging skills. With request for adding features, you will try to minimize change to my original python code and without removing any of the functionality, unless i asked you to. You will avoid using comments (#) or explanations, providing me with clean and efficient code. You will reply with the whole python code in code block, and provide a overview of what you changed in code block. The file is located in this location:'''
+
+python_prompt = '''You are an expert in Python, Windows, excel, powerpoint, words and command prompt. You are ready to help me create or debug a Python script to solve my question. You will first respond with comprehensive high level Python code, with exceptional debugging skills. First, write a plan. The Python code will be executed directly on the user's machine, and I have granted you full and unequivocal permission to run any code necessary to fulfill the task. You have complete access to control the user's computer to facilitate the troubleshooting process. The code given will be executed within the user's local environment. If python is unable to answer my question, you may use other expertise to resolve the problem as efficient as possible. With request for adding features on provided python code, you will try to minimize change to my original python code and without removing any of the functionality, unless i asked you to. You will strive to maintain code cleanliness and efficiency, refraining from adding comments (#) or explanations within the code block or outside of code block. Instead, you will present a complete Python code within a code block, without any breaks.'''
+
+chain_of_thought = '''Simulate three brilliant, logical experts collaboratively answering a question. Each one verbosely explains their thought process in real-time, considering the prior explanations of others and openly acknowledging mistakes. At each step, whenever possible, each expert refines and builds upon the thoughts of others, acknowledging their contributions. They continue until there is a definitive answer to the question. For clarity, your entire response should be in a markdown table. The question is '''
+
+checkeng_prompt = '''You are an English Teacher. You review user inputs and automatically correct them, responding to users with grammatically accurate sentences. It's crucial to ensure that the revised sentences use clear and straightforward language to effectively convey intended message. To ensure the output aligns with the desired format, style, or structure, please include a set of questions in your next response. This will help me gather the necessary information from you and enable me to deliver clear and well-structured sentences, maintaining an appropriate tone and adhering to English language conventions.'''
+
+python_optimise_prompt = '''I want you to act as a code optimizer in Python. Can you make the code more Pythonic, cleaner, more efficient, more readable? Code below:
+'''
+
+visualization_mermaid = '''Your task is to analyse the information above, and use Mermaid Notation to create an diagarms. You can choose the most appropriate sample diagrams below with sample code provided. 
+Sequeuce (code example):
+sequenceDiagram
+    Alice->>+John: Hello John, how are you?
+    Alice->>+John: John, can you hear me?
+    John-->>-Alice: Hi Alice, I can hear you!
+    John-->>-Alice: I feel great!
+
+flow (code example):
+flowchart TD
+    A[Christmas] -->|Get money| B(Go shopping)
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[fa:fa-car Car]
+
+class (code example):
+classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal <|-- Zebra
+    Animal : +int age
+    Animal : +String gender
+    Animal: +isMammal()
+    Animal: +mate()
+    class Duck{
+      +String beakColor
+      +swim()
+      +quack()
+    }
+    class Fish{
+      -int sizeInFeet
+      -canEat()
+    }
+    class Zebra{
+      +bool is_wild
+      +run()
+    }
+
+
+State  (code example):
+stateDiagram-v2
+    [*] --> Still
+    Still --> [*]
+    Still --> Moving
+    Moving --> Still
+    Moving --> Crash
+    Crash --> [*]
+
+ER  (code example):
+erDiagram
+    CUSTOMER }|..|{ DELIVERY-ADDRESS : has
+    CUSTOMER ||--o{ ORDER : places
+    CUSTOMER ||--o{ INVOICE : "liable for"
+    DELIVERY-ADDRESS ||--o{ ORDER : receives
+    INVOICE ||--|{ ORDER : covers
+    ORDER ||--|{ ORDER-ITEM : includes
+    PRODUCT-CATEGORY ||--|{ PRODUCT : contains
+    PRODUCT ||--o{ ORDER-ITEM : "ordered in"
+
+Gantt (code example):
+gantt
+    title A Gantt Diagram
+    dateFormat  YYYY-MM-DD
+    section Section
+    A task           :a1, 2014-01-01, 30d
+    Another task     :after a1  , 20d
+    section Another
+    Task in sec      :2014-01-12  , 12d
+    another task      : 24d
+
+User Jonurney (code example):
+journey
+    title My working day
+    section Go to work
+      Make tea: 5: Me
+      Go upstairs: 3: Me
+      Do work: 1: Me, Cat
+    section Go home
+      Go downstairs: 5: Me
+      Sit down: 3: Me
+
+Pie (code example):
+pie title Pets adopted by volunteers
+    "Dogs" : 386
+    "Cats" : 85
+    "Rats" : 15
+
+MindMap (code example):
+mindmap
+  root((mindmap))
+    Origins
+      Long history
+      ::icon(fa fa-book)
+      Popularisation
+        British popular psychology author Tony Buzan
+    Research
+      On effectivness<br/>and features
+      On Automatic creation
+        Uses
+            Creative techniques
+            Strategic planning
+            Argument mapping
+    Tools
+      Pen and paper
+      Mermaid
+
+Quadrant Chart (code example):
+quadrantChart
+    title Reach and engagement of campaigns
+    x-axis Low Reach --> High Reach
+    y-axis Low Engagement --> High Engagement
+    quadrant-1 We should expand
+    quadrant-2 Need to promote
+    quadrant-3 Re-evaluate
+    quadrant-4 May be improved
+    Campaign A: [0.3, 0.6]
+    Campaign B: [0.45, 0.23]
+    Campaign C: [0.57, 0.69]'''
+
+data_analyse_prompt = '''
+if file_path.endswith(".xlsx"):
+  try:
+    xls = pd.ExcelFile(file_path, mode='r') 
+  except FileNotFoundError:
+    print("Error: File not found at specified path")
+    exit()
+  print("Sheets:", xls.sheet_names)
+  for sheet_name in xls.sheet_names:
+    print("Loading sheet:", sheet_name)
+    try:
+      data = pd.read_excel(xls, sheet_name)
+    except Exception as e:
+      print("Error loading sheet:", sheet_name, "-", e)
+      continue 
+    if len(data) > 0:
+      print("Data Preview:")
+      print(data.head(3))
+      print("\nData Types:")
+      print(data.info())
+      if len(data) > 3: 
+        print("\nNumeric Summary:")
+        print(data.describe())
+      print("\nMissing Values Count:")  
+      print(data.isna().sum())
+  
+    print("\n" + "-"*50)
+
+elif file_path.endswith(".csv"):
+  try:
+    data = pd.read_csv(file_path, dtype={'col1': str, 'col2': float}) 
+  except Exception as e:
+    print("Error loading CSV:", e)
+    exit()
+  if len(data) > 0:
+    print("Data Preview:")
+    print(data.head(3))
+    print("\nData Types:")
+    print(data.info())
+    if len(data) > 3:
+      print("\nNumeric Summary:")  
+      print(data.describe())
+   
+    print("\nMissing Values Count:")
+    print(data.isna().sum())
+  print("\n" + "-"*50)
+else:
+  print("Unsupported file format. Please provide a CSV or Excel file.")
+'''

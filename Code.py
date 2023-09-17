@@ -7,7 +7,7 @@ import time
 import pyautogui
 
 running_process = None
-last_code = ""
+last_code = None
 listening_clipboard = False
 
 
@@ -44,11 +44,30 @@ def save_and_run_python_code():
     with open('guiscript.py', 'w') as file:
         file.write(code)
 
+    # Check if code starts with 'pip install'
+    if code.strip().startswith('pip install'):
+        # Save it as '_record.txt'
+        with open('_record.txt', 'w') as record_file:
+            record_file.write(code)
+
+        # Run 'gui-lite-pipinstall.py' in another instance
+        running_process_installpy = subprocess.Popen(["python", "gui-lite-pipinstall.py"], cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+
+        found_success = False
+
+        for line in running_process_installpy.stdout:
+            output = line  # Fixed here
+            result_text.config(state=tk.NORMAL)
+            result_text.insert(tk.END, output)
+            result_text.config(state=tk.DISABLED)
+            result_text.see(tk.END)
+
+        if os.path.exists('_record.txt'):
+            os.remove('_record.txt')
+
     command = ["python", "guiscript.py"]
     running_process = subprocess.Popen(
         command, cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
-    
-    update_result_text("..\n", tk.DISABLED)
 
     def update_result():
         error_found = False
@@ -75,6 +94,7 @@ def save_and_run_python_code():
 
     update_result_thread = threading.Thread(target=update_result)
     update_result_thread.start()
+
 
 def list_python_scripts():
     scripts_window = tk.Toplevel(root)
@@ -308,7 +328,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button = tk.Button(root, text="Confirm", command=open_dialogs)
     confirm_button.pack()
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.2")
+root.title("Python Code Runner Lite v1.2.1")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)

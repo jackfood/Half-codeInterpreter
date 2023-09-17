@@ -45,15 +45,13 @@ def save_and_run_python_code():
         file.write(code)
 
     # Check if code starts with 'pip install'
-    if code.strip().startswith('pip install'):
+    if code.strip().startswith('pip install')
         # Save it as '_record.txt'
         with open('_record.txt', 'w') as record_file:
             record_file.write(code)
 
         # Run 'gui-lite-pipinstall.py' in another instance
         running_process_installpy = subprocess.Popen(["python", "gui-lite-pipinstall.py"], cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
-
-        found_success = False
 
         for line in running_process_installpy.stdout:
             output = line  # Fixed here
@@ -64,6 +62,7 @@ def save_and_run_python_code():
 
         if os.path.exists('_record.txt'):
             os.remove('_record.txt')
+        return
 
     command = ["python", "guiscript.py"]
     running_process = subprocess.Popen(
@@ -205,7 +204,7 @@ def auto_paste_and_execute():
         global listening_clipboard
         if listening_clipboard:
             new_content = root.clipboard_get()
-            if new_content != clipboard_content and 'import' in new_content:
+            if new_content != clipboard_content and ('import' in new_content or 'pip install' in new_content):
                 clipboard_content = new_content
                 code_entry.delete("1.0", tk.END)
                 code_entry.insert(tk.END, clipboard_content)
@@ -328,7 +327,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button = tk.Button(root, text="Confirm", command=open_dialogs)
     confirm_button.pack()
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.2.1")
+root.title("Python Code Runner Lite v1.2.2")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)

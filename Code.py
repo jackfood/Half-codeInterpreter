@@ -45,7 +45,7 @@ def save_and_run_python_code():
         file.write(code)
 
     # Check if code starts with 'pip install'
-    if code.strip().startswith('pip install')
+    if code.strip().startswith('pip install'):
         # Save it as '_record.txt'
         with open('_record.txt', 'w') as record_file:
             record_file.write(code)

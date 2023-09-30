@@ -34,6 +34,7 @@ def update_result_text(message, state):
     result_text.config(state=state)
 
 def save_and_run_python_code():
+    update_result_text("", tk.DISABLED)
     global last_code, running_process
     code = code_entry.get("1.0", "end-1c")
     last_code = code
@@ -44,64 +45,79 @@ def save_and_run_python_code():
     with open('guiscript.py', 'w') as file:
         file.write(code)
 
-    # Check if code starts with 'pip install'
-    if code.strip().startswith('pip install'):
-        # Save it as '_record.txt'
-        with open('_record.txt', 'w') as record_file:
-            record_file.write(code)
+        # Check if code starts with 'pip install'
+        if code.strip().startswith('pip install'):
+            # Save it as '_recordpippackage.txt'
+            package_name = code.split(' ')[2].strip()
+            with open('_recordpippackage.txt', 'w') as record_file:
+                record_file.write(package_name)
 
-        # Run 'gui-lite-pipinstall.py' in another instance
-        update_status_pip = "Installing pip package..\n\n"
-        result_text.config(state=tk.NORMAL)
-        result_text.insert(tk.END, update_status_pip)
+            # Define the pip install command as a list
+            pip_install_command = ["pip", "install", package_name]
 
-        running_process_installpy = subprocess.Popen(["python", "gui-lite-pipinstall.py"], cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
-
-        for line in running_process_installpy.stdout:
-            output = line  # Fixed here
+            print(f"Installing pip package {package_name}..\n")
+            update_status_pip = f"Installing pip package {package_name}..\n"
             result_text.config(state=tk.NORMAL)
-            result_text.insert(tk.END, output)
-            result_text.config(state=tk.DISABLED)
-            result_text.see(tk.END)
+            result_text.insert(tk.END, update_status_pip)
 
-        if os.path.exists('_record.txt'):
-            os.remove('_record.txt')
-        return
-
-    command = ["python", "guiscript.py"]
-
-    update_status_py = "Running Python..\n\n"
-    result_text.config(state=tk.NORMAL)
-    result_text.insert(tk.END, update_status_py)
-
-    running_process = subprocess.Popen(
-        command, cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
-
-    def update_result():
-        error_found = False
-        while True:
-            output = running_process.stdout.readline()
-            if output == '' and running_process.poll() is not None:
-                break
-            if output:
+            try:
+                # Use subprocess to run the pip install command
+                status_update_pip_install = subprocess.run(pip_install_command, check=True, capture_output=True, text=True)
+                print(f"-- Successfully installed {package_name} -- \n{status_update_pip_install.stdout}")
+                update_status_pip_success = f"Successfully installed {package_name}..:\n{status_update_pip_install.stdout}\n\n"
                 result_text.config(state=tk.NORMAL)
-                result_text.insert(tk.END, output)
-                result_text.config(state=tk.DISABLED)
-                result_text.see(tk.END)
-                if 'error' in output.lower():
-                    error_found = True
-            time.sleep(0.1)
+                result_text.insert(tk.END, update_status_pip_success)
 
-        if error_found:
-            root.clipboard_clear()
-            root.clipboard_append(result_text.get("1.0", tk.END))
-            root.update()
-            if listening_clipboard:
-                root.after(1000, lambda: pyautogui.hotkey('ctrl', 'v'))
-                root.after(1500, lambda: pyautogui.press('enter'))
+            except subprocess.CalledProcessError as e:
+                print(f"-- Failed to install {package_name}: {e} --")
+                update_status_pip_failed = f"Failed to install {package_name}..::\n{e}\n\n\n\n"
+                result_text.config(state=tk.NORMAL)
+                result_text.insert(tk.END, update_status_pip_failed)
 
-    update_result_thread = threading.Thread(target=update_result)
-    update_result_thread.start()
+
+        else:
+            command = ["python", "guiscript.py"]
+
+            update_status_py = "Running Python\n-----\n"
+            result_text.config(state=tk.NORMAL)
+            result_text.insert(tk.END, update_status_py)
+            
+            running_process = subprocess.Popen(
+                command,
+                cwd=os.getcwd(),
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            )
+
+            if os.path.exists('_recordpippackage.txt'):
+                os.remove('_recordpippackage.txt')
+                return
+
+            def update_result():
+                error_found = False
+                while True:
+                    output = running_process.stdout.readline()
+                    if output == '' and running_process.poll() is not None:
+                        break
+                    if output:
+                        update_result_text(output, tk.DISABLED)
+                        if 'error' in output.lower():
+                            error_found = True
+                    time.sleep(0.05)
+
+                if error_found:
+                    root.clipboard_clear()
+                    root.clipboard_append(result_text.get("1.0", tk.END))
+                    root.update()
+                    if listening_clipboard:
+                        root.after(1000, lambda: pyautogui.hotkey('ctrl', 'v'))
+                        root.after(1500, lambda: pyautogui.press('enter'))
+
+            update_result_thread = threading.Thread(target=update_result)
+            update_result_thread.start()
+
 
 
 def list_python_scripts():
@@ -180,6 +196,7 @@ def process_pyoptimise():
     code = f'''{python_optimise_prompt}'''
     insert_code_into_entry(code)
 
+# to fix this def for intend issue
 def process_python_prompt_Analyse_S1():
     input_location_2 = filedialog.askopenfilename(title="Select Excel/CSV Input File", filetypes=[("Excel Files", "*.xlsx"), ("CSV Files", "*.csv")])
     if not input_location_2:

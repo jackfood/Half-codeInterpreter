@@ -107,8 +107,8 @@ def save_and_run_python_code():
                     root.clipboard_append(result_text.get("1.0", tk.END))
                     root.update()
                     if listening_clipboard:
-                        root.after(1000, lambda: pyautogui.hotkey('ctrl', 'v'))
-                        root.after(1500, lambda: pyautogui.press('enter'))
+                        root.after(3000, lambda: pyautogui.hotkey('ctrl', 'v'))
+                        root.after(1000, lambda: pyautogui.press('enter'))
 
             update_result_thread = threading.Thread(target=update_result)
             update_result_thread.start()
@@ -212,6 +212,7 @@ def auto_paste_and_execute():
         auto_paste_button.config(text="Disable Auto Paste & Execute")
     else:
         auto_paste_button.config(text="Enable Auto Paste & Execute")
+        return
 
     clipboard_content = ""
 
@@ -225,9 +226,11 @@ def auto_paste_and_execute():
                 code_entry.delete("1.0", tk.END)
                 code_entry.insert(tk.END, clipboard_content)
                 save_and_run_python_code()
-                if 'import matplotlib' in clipboard_content:
-                    listening_clipboard = False
-                    auto_paste_button.config(text="Enable Auto Paste & Execute")
+
+# doing trial to disable this function
+              # if 'import matplotlib' in clipboard_content:
+                #   listening_clipboard = False
+                #   auto_paste_button.config(text="Enable Auto Paste & Execute")
             root.after(1000, check_clipboard)
 
     check_clipboard()

@@ -10,7 +10,6 @@ running_process = None
 last_code = None
 listening_clipboard = False
 
-
 # Load environment variables from .env2 file
 with open('.env2', 'r') as env_file:
     env_content = env_file.read()
@@ -74,26 +73,20 @@ def save_and_run_python_code():
                 result_text.config(state=tk.NORMAL)
                 result_text.insert(tk.END, update_status_pip_failed)
 
-
-        else:
-            command = ["python", "guiscript.py"]
-
-            update_status_py = "Running Python\n-----\n"
-            result_text.config(state=tk.NORMAL)
-            result_text.insert(tk.END, update_status_py)
-            
-            running_process = subprocess.Popen(
-                command,
-                cwd=os.getcwd(),
-                shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                universal_newlines=True
-            )
-
             if os.path.exists('_recordpippackage.txt'):
                 os.remove('_recordpippackage.txt')
                 return
+        else:
+            command = ["python", "guiscript.py"]
+
+            update_status_py = "Python\n--\n"
+            running_process = subprocess.Popen(
+                command, cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+
+            result_text.config(state=tk.NORMAL)
+            result_text.delete("1.0", tk.END)
+            result_text.insert(tk.END, update_status_py)
+            result_text.config(state=tk.DISABLED)
 
             def update_result():
                 error_found = False
@@ -102,7 +95,9 @@ def save_and_run_python_code():
                     if output == '' and running_process.poll() is not None:
                         break
                     if output:
-                        update_result_text(output, tk.DISABLED)
+                        result_text.config(state=tk.NORMAL)
+                        result_text.insert(tk.END, output)
+                        # update_result_text(output, tk.DISABLED)
                         if 'error' in output.lower():
                             error_found = True
                     time.sleep(0.05)
@@ -117,8 +112,6 @@ def save_and_run_python_code():
 
             update_result_thread = threading.Thread(target=update_result)
             update_result_thread.start()
-
-
 
 def list_python_scripts():
     scripts_window = tk.Toplevel(root)
@@ -196,7 +189,6 @@ def process_pyoptimise():
     code = f'''{python_optimise_prompt}'''
     insert_code_into_entry(code)
 
-# to fix this def for intend issue
 def process_python_prompt_Analyse_S1():
     input_location_2 = filedialog.askopenfilename(title="Select Excel/CSV Input File", filetypes=[("Excel Files", "*.xlsx"), ("CSV Files", "*.csv")])
     if not input_location_2:
@@ -209,11 +201,9 @@ import pandas as pd
 file_path = r"{input_location_2}"
 {data_analyse_prompt}
 '''
-
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
     save_and_run_python_code()
-
 
 def auto_paste_and_execute():
     global listening_clipboard
@@ -342,7 +332,6 @@ def process_python_prompt_Analyse_S2():
 
         code = f'''I want you to act as a data scientist coding in Python strictly without explanation and #. Given the provided dataframe containing the columns, use matplotlib to plot a ({selected_plot.get()}) to visualize the variables ({headers_vis}). Insert title as ({title_vis}). Set the color theme ({selected_color_scheme.get()}) using the main colour as light ({selected_color_type.get()}). Please include the file directory for df in python code block.'''
 
-
         insert_code_into_entry(code)
         plot_type_menu.pack_forget()
         color_scheme_menu.pack_forget()
@@ -353,7 +342,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button = tk.Button(root, text="Confirm", command=open_dialogs)
     confirm_button.pack()
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.2.3")
+root.title("Python Code Runner Lite v1.3")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)
@@ -385,7 +374,6 @@ python_prompt_menu.add_command(label="Python Prompt", command=process_python_pro
 python_prompt_menu.add_command(label="Python Code Optimization", command=process_pyoptimise)
 python_prompt_menu.add_command(label="Mermaid Flow Diagram Prompt", command=process_visualization_mermaid)
 #python_prompt_menu.add_command(label="", command=)
-
 
 code_label = tk.Label(root, text="Enter Python Code:")
 code_label.pack()

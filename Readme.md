@@ -19,11 +19,14 @@ Please note that for error prompt assistance after execute the code, you will in
 
 ## Features
 
+- (New) **Identify Pip Install** Auto pip Install if detected within the code.
+- **(Main Feature) Auto Paste & Execute:** Automatically paste code from the clipboard and execute it when the word 'import' is detected. Using the web version of generative AI with an embedded code block can be useful. You can simply click the 'Copy' button within the code block to copy the code to your clipboard. This action leads to the immediate execution of the copied Python code. If an error is detected, this will again automatically copies the error message back to your clipboard. This facilitates the process of debugging or further processing by allowing you to easily return the error message to the web generative AI, which is very similar to the existing code interpreter in GPT-4.
 - **Execute Python Code:** Write and execute Python code snippets or scripts within the GUI.
 - **Interactive with ChatGPT:** Utilize the built-in interface with ChatGPT for code generation and debugging. Please note that this tool does not execute code in the background like GPT-4; you must manually run the code.
 - **Handle Excel/CSV Data Analysis:** Simplify data analysis tasks for Excel and CSV files. Generate Python code snippets to assist in data exploration, cleaning, and analysis.
 - **List Python Scripts:** View a list of Python scripts in your directory and select them for editing.
-- **(Main Feature) Auto Paste & Execute:** Automatically paste code from the clipboard and execute it when the word 'import' is detected. Using the web version of generative AI with an embedded code block can be useful. You can simply click the 'Copy' button within the code block to copy the code to your clipboard. This action leads to the immediate execution of the copied Python code. If an error is detected, this will again automatically copies the error message back to your clipboard. This facilitates the process of debugging or further processing by allowing you to easily return the error message to the web generative AI, which is very similar to the existing code interpreter in GPT-4.
+- (New) Better progress update in the console.
+
 
 ## Requirements
 

@@ -1,6 +1,6 @@
-# Python Code Runner Lite (Half Code interpreter) for Data Analysis
+# Python Code Runner Lite (Half Code interpreter) for using Web ChatGPT 3.5 Turbo.
 
-This code is made by GPT 3.5 turbo on my idea. I have no coding experience.
+This code is made totally with the help of Web ChatGPT 3.5 turbo on my idea. I have no coding experience.
 
 This Python code runner (Half Code interpreter) with a graphical user interface (GUI) aims to mimic the behavior of Code Interpreter in GPT-4, where code execution happens locally. 
 Please note that for error prompt assistance after execute the code, you will input copy errors to the web version of ChatGPT 3.5 Turbo (OpenAI account required) or other generative AI services (e.g. Claude 2, poe) for debugging. (ensure Mouse Cursor / focus is on the input text if automatic listening is on)

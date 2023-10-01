@@ -26,6 +26,7 @@ Please note that for error prompt assistance after execute the code, you will in
 - **Handle Excel/CSV Data Analysis:** Simplify data analysis tasks for Excel and CSV files. Generate Python code snippets to assist in data exploration, cleaning, and analysis.
 - **List Python Scripts:** View a list of Python scripts in your directory and select them for editing.
 - (New) Better progress update in the console.
+- (New) Added some default prompts including excel dataset analyses.
 
 
 ## Requirements

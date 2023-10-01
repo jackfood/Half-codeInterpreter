@@ -9,6 +9,7 @@ import pyautogui
 running_process = None
 last_code = None
 listening_clipboard = False
+print("auto_paste - Off")
 
 # Load environment variables from .env2 file
 with open('.env2', 'r') as env_file:
@@ -27,12 +28,15 @@ python_optimise_prompt = env_variables['python_optimise_prompt']
 
 
 def update_result_text(message, state):
+
     result_text.config(state=tk.NORMAL)
     result_text.delete("1.0", tk.END)
     result_text.insert(tk.END, message)
     result_text.config(state=state)
+    print("def update_result_text completed")
 
 def save_and_run_python_code():
+    print("def save_and_run_python_code started.")
     update_result_text("", tk.DISABLED)
     global last_code, running_process
     code = code_entry.get("1.0", "end-1c")
@@ -40,16 +44,20 @@ def save_and_run_python_code():
 
     if running_process and running_process.poll() is None:
         running_process.kill()
+        print("running_process.kill")
 
     with open('guiscript.py', 'w') as file:
         file.write(code)
+        print("writed code to guiscript.txt")
 
         # Check if code starts with 'pip install'
         if code.strip().startswith('pip install'):
+            print("pip install detected")
             # Save it as '_recordpippackage.txt'
             package_name = code.split(' ')[2].strip()
             with open('_recordpippackage.txt', 'w') as record_file:
                 record_file.write(package_name)
+                print("write _recordpippackage completed")
 
             # Define the pip install command as a list
             pip_install_command = ["pip", "install", package_name]
@@ -69,44 +77,55 @@ def save_and_run_python_code():
 
             except subprocess.CalledProcessError as e:
                 print(f"-- Failed to install {package_name}: {e} --")
-                update_status_pip_failed = f"Failed to install {package_name}..::\n{e}\n\n\n\n"
+                update_status_pip_failed = f"Failed to install {package_name}..::\n{e}\n\n"
                 result_text.config(state=tk.NORMAL)
                 result_text.insert(tk.END, update_status_pip_failed)
 
             if os.path.exists('_recordpippackage.txt'):
                 os.remove('_recordpippackage.txt')
+                print(f"Removed _recordpippackage.txt\n")
                 return
         else:
             command = ["python", "guiscript.py"]
+            print(f"Activate command python.txt\n")
 
             update_status_py = "Python\n--\n"
+            print("Running Python...")
             running_process = subprocess.Popen(
                 command, cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+
 
             result_text.config(state=tk.NORMAL)
             result_text.delete("1.0", tk.END)
             result_text.insert(tk.END, update_status_py)
             result_text.config(state=tk.DISABLED)
+            print(f"Python completed {running_process}")
 
             def update_result():
                 error_found = False
                 while True:
                     output = running_process.stdout.readline()
                     if output == '' and running_process.poll() is not None:
+                        print("Output is empty and not running process poll - Break!")
                         break
                     if output:
+                        print(f"{output}\n")
                         result_text.config(state=tk.NORMAL)
                         result_text.insert(tk.END, output)
                         # update_result_text(output, tk.DISABLED)
                         if 'error' in output.lower():
+                            print("Error Found while running code!")
                             error_found = True
                     time.sleep(0.05)
 
                 if error_found:
                     root.clipboard_clear()
+                    print("Clipboard Cleared")
                     root.clipboard_append(result_text.get("1.0", tk.END))
                     root.update()
+                    print("updated error in GUI.")
                     if listening_clipboard:
+                        print("auto-paste On, proceed auto enter ctrl v and enter after 3 seconds")
                         root.after(3000, lambda: pyautogui.hotkey('ctrl', 'v'))
                         root.after(1000, lambda: pyautogui.press('enter'))
 
@@ -114,6 +133,7 @@ def save_and_run_python_code():
             update_result_thread.start()
 
 def list_python_scripts():
+    print("def list_python_scripts started.")
     scripts_window = tk.Toplevel(root)
     scripts_window.title("List of Python Scripts")
     script_listbox = tk.Listbox(scripts_window)
@@ -141,14 +161,17 @@ def list_python_scripts():
     copy_button.pack()
 
 def process_excel_csv_option():
+    print("def process_excel_csv_option started.")
     input_location = filedialog.askopenfilename(title="Select Excel/CSV Input File", filetypes=[("Excel/CSV Files", "*.xlsx *.csv")])
     if not input_location:
         messagebox.showerror("Error", "Input location cannot be empty.")
+        print("messagbox.showerror - input location empty")
         return
 
     output_location = filedialog.askdirectory(title="Select Output Directory")
     if not output_location:
         messagebox.showerror("Error", "Output location cannot be empty.")
+        print("messagbox.showerror - location empty")
         return
 
     code = f'''{excel_csv_prompt}
@@ -157,14 +180,18 @@ Save to directory if needed: {output_location}'''
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
     update_result_text("Copy above python prompt into ChatGPT\n", tk.DISABLED)
+    print("Completed/n")
 
 # Add insert code function ####################
 def insert_code_into_entry(code):
+    print("def insert_code_into_entry started.")
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
     update_result_text("Copy above python prompt into ChatGPT\n", tk.DISABLED)
+    print("Completed/n")
 
 def process_chain_of_thought():
+    print("def process_chain_of_thought started.")
     question_COT = simpledialog.askstring("Enter Your Question", "Enter Your Question:", parent=root)
     if question_COT is not None:
         code = f'''{chain_of_thought} {question_COT}'''
@@ -172,27 +199,34 @@ def process_chain_of_thought():
 
     # Bind Enter key to trigger 'OK' button
     root.bind('<Return>', lambda event=None: root.focus_force())
+    print("Completed/n")
 
 def process_python_prompt_option():
     code = f'''{python_prompt}'''
     insert_code_into_entry(code)
+    print("process_python_prompt_option selected")
 
 def process_checkeng_prompt_option():
     code = f'''{checkeng_prompt}'''
     insert_code_into_entry(code)
+    print("process_checkeng_prompt_option selected")
 
 def process_visualization_mermaid():
     code = f'''{visualization_mermaid}'''
     insert_code_into_entry(code)
+    print("process_visualization_mermaid selected")
 
 def process_pyoptimise():
     code = f'''{python_optimise_prompt}'''
     insert_code_into_entry(code)
+    print("process_pyoptimise selected")
 
 def process_python_prompt_Analyse_S1():
+    print("process_python_prompt_Analyse_S1 selected")
     input_location_2 = filedialog.askopenfilename(title="Select Excel/CSV Input File", filetypes=[("Excel Files", "*.xlsx"), ("CSV Files", "*.csv")])
     if not input_location_2:
         messagebox.showerror("Error", "Input location cannot be empty.")
+        print("process_python_prompt_Analyse_S1 messagebox.showerror")
         return
 
     code = f'''
@@ -204,28 +238,36 @@ file_path = r"{input_location_2}"
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
     save_and_run_python_code()
+    print("process_python_prompt_Analyse_S1 running code")
 
 def auto_paste_and_execute():
     global listening_clipboard
     listening_clipboard = not listening_clipboard
+    print("listening_clipboard - Off")
     if listening_clipboard:
         auto_paste_button.config(text="Disable Auto Paste & Execute")
+        print("auto_paste - On")
     else:
         auto_paste_button.config(text="Enable Auto Paste & Execute")
+        print("auto_paste - Off")
         return
 
     clipboard_content = ""
+    print("Clear Clipboard content")
 
     def check_clipboard():
         nonlocal clipboard_content
         global listening_clipboard
         if listening_clipboard:
             new_content = root.clipboard_get()
+            print("Get Content from Clipboard.")
             if new_content != clipboard_content and ('import' in new_content or 'pip install' in new_content):
+                print("Checking and comparing clipboard content.")
                 clipboard_content = new_content
                 code_entry.delete("1.0", tk.END)
                 code_entry.insert(tk.END, clipboard_content)
                 save_and_run_python_code()
+                print("New Content! Auto Run python code.")
 
 # doing trial to disable this function
               # if 'import matplotlib' in clipboard_content:
@@ -236,6 +278,7 @@ def auto_paste_and_execute():
     check_clipboard()
 
 def process_python_prompt_Analyse_S2():
+    print("process_python_prompt_Analyse_S2 started. Starting new options.")
     plot_types = [
         "----Select a plot----",
         "Plot Chart",
@@ -344,8 +387,10 @@ def process_python_prompt_Analyse_S2():
     # Create a button to trigger the input dialogs
     confirm_button = tk.Button(root, text="Confirm", command=open_dialogs)
     confirm_button.pack()
+
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.3")
+root.title("Python Code Runner Lite v1.3.1")
+print("Creating form.")
 
 menu_bar = Menu(root)
 root.config(menu=menu_bar)
@@ -396,5 +441,6 @@ auto_paste_button.pack()
 result_text = scrolledtext.ScrolledText(root, height=10, width=40, bg="black", fg="white")
 result_text.pack(fill=tk.BOTH, expand=True)
 result_text.config(state=tk.DISABLED)
+print("Form Creation Completed.")
 
 root.mainloop()

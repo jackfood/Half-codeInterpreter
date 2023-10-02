@@ -12,7 +12,7 @@ listening_clipboard = False
 print("auto_paste - Off")
 
 # Load environment variables from .env2 file
-with open('.env2', 'r') as env_file:
+with open('.env2', 'r', encoding='utf-8') as env_file:
     env_content = env_file.read()
     env_variables = {}
     exec(env_content, env_variables)
@@ -23,6 +23,14 @@ chain_of_thought = env_variables['chain_of_thought']
 checkeng_prompt = env_variables['checkeng_prompt']
 visualization_mermaid = env_variables['visualization_mermaid']
 python_optimise_prompt = env_variables['python_optimise_prompt']
+prompt_generator_prompt = env_variables['prompt_generator']
+table_organizer_prompt = env_variables['table_organizer']
+summarise_text_prompt = env_variables['summarise_text']
+ai_writing_assistant_prompt = env_variables['ai_writing_assistant']
+unrestricted_opinion_prompt = env_variables['unrestricted_opinion']
+cohesion_and_engagement_improver_prompt = env_variables['cohesion_and_engagement_improver']
+professional_writer_prompt = env_variables['professional_writer']
+# = env_variables['']
 # = env_variables['']
 # = env_variables['']
 
@@ -221,6 +229,36 @@ def process_pyoptimise():
     insert_code_into_entry(code)
     print("process_pyoptimise selected")
 
+def prompt_generator():
+    code = f'''{prompt_generator_prompt}'''
+    insert_code_into_entry(code)
+    print("prompt_generator selected")
+def table_organizer():
+    code = f'''{table_organizer_prompt}'''
+    insert_code_into_entry(code)
+    print("table_organizer selected")
+def summarise_text():
+    code = f'''{summarise_text_prompt}'''
+    insert_code_into_entry(code)
+    print("summarise_text selected")
+def ai_writing_assistant():
+    code = f'''{ai_writing_assistant_prompt}'''
+    insert_code_into_entry(code)
+    print("ai_writing_assistant selected")
+def unrestricted_opinion():
+    code = f'''{unrestricted_opinion_prompt}'''
+    insert_code_into_entry(code)
+    print("unrestricted_opinion selected")
+def cohesion_and_engagement_improver():
+    code = f'''{cohesion_and_engagement_improver_prompt}'''
+    insert_code_into_entry(code)
+    print("cohesion_and_engagement_improver selected")
+def professional_writer():
+    code = f'''{professional_writer_prompt}'''
+    insert_code_into_entry(code)
+    print("professional_writer selected")
+
+
 def process_python_prompt_Analyse_S1():
     print("process_python_prompt_Analyse_S1 selected")
     input_location_2 = filedialog.askopenfilename(title="Select Excel/CSV Input File", filetypes=[("Excel Files", "*.xlsx"), ("CSV Files", "*.csv")])
@@ -389,7 +427,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button.pack()
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.3.1")
+root.title("Python Code Runner Lite v1.3.3")
 print("Creating form.")
 
 menu_bar = Menu(root)
@@ -409,6 +447,14 @@ menu_bar.add_command(label="List Python Scripts", command=list_python_scripts)
 gpt_prompt_menu = Menu(menu_bar)
 menu_bar.add_cascade(label="ChatGPT prompts", menu=gpt_prompt_menu)
 gpt_prompt_menu.add_command(label="English Check", command=process_checkeng_prompt_option)
+gpt_prompt_menu.add_command(label="Prompt Generator", command=prompt_generator)
+gpt_prompt_menu.add_command(label="Table Organizer", command=table_organizer)
+gpt_prompt_menu.add_command(label="Summarise Text", command=summarise_text)
+gpt_prompt_menu.add_command(label="AI writing assistant", command=ai_writing_assistant)
+gpt_prompt_menu.add_command(label="Unrestricted Opinion Prompt", command=unrestricted_opinion)
+gpt_prompt_menu.add_command(label="Flow and Cohesion of Sentence Improver", command=cohesion_and_engagement_improver)
+gpt_prompt_menu.add_command(label="Professional Writer", command=professional_writer )
+# gpt_prompt_menu.add_command(label="", command=)
 # gpt_prompt_menu.add_command(label="", command=)
 # gpt_prompt_menu.add_command(label="", command=)
 # gpt_prompt_menu.add_command(label="", command=)

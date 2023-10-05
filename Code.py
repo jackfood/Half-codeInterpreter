@@ -36,7 +36,6 @@ professional_writer_prompt = env_variables['professional_writer']
 
 
 def update_result_text(message, state):
-
     result_text.config(state=tk.NORMAL)
     result_text.delete("1.0", tk.END)
     result_text.insert(tk.END, message)
@@ -44,11 +43,19 @@ def update_result_text(message, state):
     print("def update_result_text completed")
 
 def save_and_run_python_code():
+    listening_clipboard_previous_status = False
     print("def save_and_run_python_code started.")
     update_result_text("", tk.DISABLED)
-    global last_code, running_process
+    global last_code, running_process, listening_clipboard
+    print(f"Inside function: listening_clipboard = {listening_clipboard}, listening_clipboard_previous_status = {listening_clipboard_previous_status}")
+    listening_clipboard_previous_status = listening_clipboard
+    print(f"Listening Clipboard status: {listening_clipboard}")
+    print(f"Listening Clipboard Previous status: {listening_clipboard_previous_status}")
+    auto_paste_button_off()
     code = code_entry.get("1.0", "end-1c")
     last_code = code
+
+    print(f"After function: listening_clipboard = {listening_clipboard}, listening_clipboard_previous_status = {listening_clipboard_previous_status}")
 
     if running_process and running_process.poll() is None:
         running_process.kill()
@@ -92,8 +99,44 @@ def save_and_run_python_code():
             if os.path.exists('_recordpippackage.txt'):
                 os.remove('_recordpippackage.txt')
                 print(f"Removed _recordpippackage.txt\n")
+                listening_clipboard = False
+                auto_paste_button_off()
+                return
+            
+        # Check if code starts with 'pip uninstall'    
+        elif code.strip().startswith('pip uninstall'):
+            print("pip uninstall detected")
+            # Save it as '_recordpippackage.txt'
+            package_name = code.split(' ')[2].strip()
+            with open('_recordpippackage.txt', 'w') as record_file:
+                record_file.write(package_name)
+                print("write _recordpippackage completed")
+
+            try:      
+                pip_uninstall_command = ["pip", "uninstall", "-y", package_name]
+                status_update_pip_uninstall = subprocess.run(pip_uninstall_command, check=True, stdout=subprocess.PIPE, text=True)
+                print(f"Uninstalling pip package {package_name}..\n")
+                result_text.config(state=tk.NORMAL)
+                # status_update_pip_uninstall = subprocess.run(pip_uninstall_command, check=True, stdout=subprocess.PIPE, text=True)
+                print(f"-- Successfully uninstalled {package_name} -- \n{status_update_pip_uninstall.stdout}")
+                update_status_pip_success = f"{status_update_pip_uninstall.stdout}"
+                result_text.config(state=tk.NORMAL)
+                result_text.insert(tk.END, update_status_pip_success)
+
+            except subprocess.CalledProcessError as e:
+                print(f"-- Failed to uninstall {package_name}: {e} --")
+                update_status_pip_failed = f"Failed to uninstall {package_name}::\n{e}"
+                result_text.config(state=tk.NORMAL)
+                result_text.insert(tk.END, update_status_pip_failed)
+
+            if os.path.exists('_recordpippackage.txt'):
+                os.remove('_recordpippackage.txt')
+                print(f"Removed _recordpippackage.txt\n")
+                listening_clipboard = False
+                auto_paste_button_off()
                 return
         else:
+            #Run Python Code
             command = ["python", "guiscript.py"]
             print(f"Activate command python.txt\n")
 
@@ -102,40 +145,46 @@ def save_and_run_python_code():
             running_process = subprocess.Popen(
                 command, cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
 
-
             result_text.config(state=tk.NORMAL)
             result_text.delete("1.0", tk.END)
             result_text.insert(tk.END, update_status_py)
-            result_text.config(state=tk.DISABLED)
-            print(f"Python completed {running_process}")
+            print(f"{running_process}")
 
             def update_result():
                 error_found = False
                 while True:
                     output = running_process.stdout.readline()
                     if output == '' and running_process.poll() is not None:
-                        print("Output is empty and not running process poll - Break!")
+                        if listening_clipboard_previous_status:
+                            listening_clipboard = True
+                            auto_paste_button_on()
+                            listening_clipboard_loop()
+                            print("Resume Clipboard Listening - Code 1")
                         break
                     if output:
-                        print(f"{output}\n")
+                        print(f"{output}")
                         result_text.config(state=tk.NORMAL)
                         result_text.insert(tk.END, output)
                         # update_result_text(output, tk.DISABLED)
                         if 'error' in output.lower():
-                            print("Error Found while running code!")
                             error_found = True
+                            if listening_clipboard_previous_status:
+                                listening_clipboard = False
+                                auto_paste_button_off()
+                                print("Clipboard Listening OFF - Code 2")
                     time.sleep(0.05)
 
                 if error_found:
                     root.clipboard_clear()
-                    print("Clipboard Cleared")
                     root.clipboard_append(result_text.get("1.0", tk.END))
                     root.update()
-                    print("updated error in GUI.")
-                    if listening_clipboard:
-                        print("auto-paste On, proceed auto enter ctrl v and enter after 3 seconds")
+                    if listening_clipboard_previous_status:
                         root.after(3000, lambda: pyautogui.hotkey('ctrl', 'v'))
                         root.after(1000, lambda: pyautogui.press('enter'))
+                        listening_clipboard = True
+                        auto_paste_button_on()
+                        listening_clipboard_loop()
+                        print(f"Listening Clipboard status: {listening_clipboard}")
 
             update_result_thread = threading.Thread(target=update_result)
             update_result_thread.start()
@@ -278,42 +327,54 @@ file_path = r"{input_location_2}"
     save_and_run_python_code()
     print("process_python_prompt_Analyse_S1 running code")
 
+def auto_paste_button_on():
+    global listening_clipboard
+    auto_paste_button.config(text="Disable Auto Paste & Execute")
+    listening_clipboard = True
+    print("auto_paste - On")
+
+def auto_paste_button_off():
+    global listening_clipboard
+    auto_paste_button.config(text="Enable Auto Paste & Execute")
+    listening_clipboard = False
+    print("auto_paste - Off")
+
+clipboard_content = ""
+
 def auto_paste_and_execute():
     global listening_clipboard
+    global clipboard_content  # Add this line to access clipboard_content
+    print(f"listening_clipboard status: {listening_clipboard}")
     listening_clipboard = not listening_clipboard
-    print("listening_clipboard - Off")
+    listening_clipboard_loop()
+    
+def listening_clipboard_loop():
     if listening_clipboard:
-        auto_paste_button.config(text="Disable Auto Paste & Execute")
-        print("auto_paste - On")
+        auto_paste_button_on()
+        check_clipboard()
+        root.after(1000, listening_clipboard_loop)
     else:
-        auto_paste_button.config(text="Enable Auto Paste & Execute")
-        print("auto_paste - Off")
+        auto_paste_button_off()
         return
 
-    clipboard_content = ""
-    print("Clear Clipboard content")
-
-    def check_clipboard():
-        nonlocal clipboard_content
-        global listening_clipboard
-        if listening_clipboard:
-            new_content = root.clipboard_get()
-            print("Get Content from Clipboard.")
-            if new_content != clipboard_content and ('import' in new_content or 'pip install' in new_content):
-                print("Checking and comparing clipboard content.")
-                clipboard_content = new_content
-                code_entry.delete("1.0", tk.END)
-                code_entry.insert(tk.END, clipboard_content)
-                save_and_run_python_code()
-                print("New Content! Auto Run python code.")
+def check_clipboard():
+    global listening_clipboard
+    global clipboard_content  # Add this line to access clipboard_content
+    if listening_clipboard:
+        new_content = root.clipboard_get()
+        if new_content != clipboard_content and ('import' in new_content or 'pip install' in new_content):
+            print("Checking and comparing clipboard content.")
+            clipboard_content = new_content
+            code_entry.delete("1.0", tk.END)
+            code_entry.insert(tk.END, clipboard_content)
+            save_and_run_python_code()
+            print("Python Code Run")
 
 # doing trial to disable this function
               # if 'import matplotlib' in clipboard_content:
                 #   listening_clipboard = False
                 #   auto_paste_button.config(text="Enable Auto Paste & Execute")
-            root.after(1000, check_clipboard)
-
-    check_clipboard()
+        print("Clipboard Listening...")
 
 def process_python_prompt_Analyse_S2():
     print("process_python_prompt_Analyse_S2 started. Starting new options.")
@@ -427,7 +488,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button.pack()
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.3.3")
+root.title("Python Code Runner Lite v1.3.5 (debug mode)")
 print("Creating form.")
 
 menu_bar = Menu(root)

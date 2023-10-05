@@ -1,4 +1,4 @@
-# Python Code Runner Lite (Half Code interpreter) for using Web ChatGPT 3.5 Turbo.
+# Half Code interpreter - Python for using Web ChatGPT 3.5 Turbo.
 
 This code is made totally with the help of Web ChatGPT 3.5 turbo on my idea. I have no coding experience.
 

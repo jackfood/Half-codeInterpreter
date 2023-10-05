@@ -54,6 +54,8 @@ pip install -r requirements.txt
 2. Click the "Save and Run Code" button to execute the code. The output will be displayed in the lower text area.
 
 3. If an error occurs during code execution, the error message will be automatically copied to the clipboard for your convenience. Seek assistance in the web version of ChatGPT 3.5 Turbo (OpenAI account required) by pasting the error.
+   
+4. (NEW) - Priority if codes contain 'pip install' and 'pip uninstall', it will perform install / uninstall of the package.
 
 ### Handling Excel/CSV Files
 
@@ -76,8 +78,9 @@ pip install -r requirements.txt
 ## Auto Paste & Execute
 
 - Click the "Enable Auto Paste & Execute" button to enable automatic code pasting and execution.
+- (NEW) durng execution, "Enable Auto Paste & Execute" button will be disabled and resume upon code completion
 
-- When enabled, the tool will periodically (every 2 seconds) check your clipboard for Python code. If it detects the word 'import' in your clipboard, it will automatically paste and execute the code. It also compares whether the data in the existing python code input area is the same as the clipboard data. If it is the same, it will prevent copying and execute the code to prevent duplicate running of the code every 2 seconds, afterwhich, it will continue to listen until user clicked on the "Disable Auto Paste & Execute" button.
+- When enabled, the tool will periodically (every 1 seconds) check your clipboard for Python code. If it detects the word 'import' in your clipboard, it will automatically paste and execute the code. It also compares whether the data in the existing python code input area is the same as the clipboard data. If it is the same, it will prevent copying and execute the code to prevent duplicate running of the code every 2 seconds, afterwhich, it will continue to listen until user clicked on the "Disable Auto Paste & Execute" button.
 
 - To disable this feature, click the "Disable Auto Paste & Execute" button.
 

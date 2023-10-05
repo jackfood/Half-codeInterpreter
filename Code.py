@@ -36,6 +36,7 @@ professional_writer_prompt = env_variables['professional_writer']
 
 
 def update_result_text(message, state):
+
     result_text.config(state=tk.NORMAL)
     result_text.delete("1.0", tk.END)
     result_text.insert(tk.END, message)
@@ -51,7 +52,7 @@ def save_and_run_python_code():
     listening_clipboard_previous_status = listening_clipboard
     print(f"Listening Clipboard status: {listening_clipboard}")
     print(f"Listening Clipboard Previous status: {listening_clipboard_previous_status}")
-    auto_paste_button_off()
+    auto_paste_button_disabled()
     code = code_entry.get("1.0", "end-1c")
     last_code = code
 
@@ -135,6 +136,7 @@ def save_and_run_python_code():
                 listening_clipboard = False
                 auto_paste_button_off()
                 return
+
         else:
             #Run Python Code
             command = ["python", "guiscript.py"]
@@ -144,6 +146,7 @@ def save_and_run_python_code():
             print("Running Python...")
             running_process = subprocess.Popen(
                 command, cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+
 
             result_text.config(state=tk.NORMAL)
             result_text.delete("1.0", tk.END)
@@ -329,13 +332,19 @@ file_path = r"{input_location_2}"
 
 def auto_paste_button_on():
     global listening_clipboard
-    auto_paste_button.config(text="Disable Auto Paste & Execute")
+    auto_paste_button.config(text="Disable Auto Paste & Execute", state="normal")
     listening_clipboard = True
     print("auto_paste - On")
 
 def auto_paste_button_off():
     global listening_clipboard
-    auto_paste_button.config(text="Enable Auto Paste & Execute")
+    auto_paste_button.config(text="Enable Auto Paste & Execute", state="normal")
+    listening_clipboard = False
+    print("auto_paste - Off")
+
+def auto_paste_button_disabled():
+    global listening_clipboard
+    auto_paste_button.config(text="Disabled - python running", state="disabled")
     listening_clipboard = False
     print("auto_paste - Off")
 
@@ -375,6 +384,8 @@ def check_clipboard():
                 #   listening_clipboard = False
                 #   auto_paste_button.config(text="Enable Auto Paste & Execute")
         print("Clipboard Listening...")
+        
+
 
 def process_python_prompt_Analyse_S2():
     print("process_python_prompt_Analyse_S2 started. Starting new options.")
@@ -488,7 +499,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button.pack()
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.3.5 (debug mode)")
+root.title("Python Code Runner Lite v1.3.6 (debug mode)")
 print("Creating form.")
 
 menu_bar = Menu(root)

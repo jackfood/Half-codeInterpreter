@@ -136,7 +136,7 @@ def save_and_run_python_code():
                 listening_clipboard = False
                 auto_paste_button_off()
                 return
-
+            
         else:
             #Run Python Code
             command = ["python", "guiscript.py"]
@@ -146,7 +146,6 @@ def save_and_run_python_code():
             print("Running Python...")
             running_process = subprocess.Popen(
                 command, cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
-
 
             result_text.config(state=tk.NORMAL)
             result_text.delete("1.0", tk.END)
@@ -159,7 +158,6 @@ def save_and_run_python_code():
                     output = running_process.stdout.readline()
                     if output == '' and running_process.poll() is not None:
                         if listening_clipboard_previous_status:
-                            listening_clipboard = True
                             auto_paste_button_on()
                             listening_clipboard_loop()
                             print("Resume Clipboard Listening - Code 1")
@@ -171,10 +169,6 @@ def save_and_run_python_code():
                         # update_result_text(output, tk.DISABLED)
                         if 'error' in output.lower():
                             error_found = True
-                            if listening_clipboard_previous_status:
-                                listening_clipboard = False
-                                auto_paste_button_off()
-                                print("Clipboard Listening OFF - Code 2")
                     time.sleep(0.05)
 
                 if error_found:
@@ -182,9 +176,13 @@ def save_and_run_python_code():
                     root.clipboard_append(result_text.get("1.0", tk.END))
                     root.update()
                     if listening_clipboard_previous_status:
-                        root.after(3000, lambda: pyautogui.hotkey('ctrl', 'v'))
-                        root.after(1000, lambda: pyautogui.press('enter'))
-                        listening_clipboard = True
+                        for _ in range(7):
+                            pyautogui.press('tab')
+                            time.sleep(0.3)
+                        root.after(500, lambda: pyautogui.hotkey('ctrl', 'v'))
+                        time.sleep(1)
+                        root.after(500, lambda: pyautogui.press('enter'))
+                        time.sleep(3)
                         auto_paste_button_on()
                         listening_clipboard_loop()
                         print(f"Listening Clipboard status: {listening_clipboard}")
@@ -385,8 +383,6 @@ def check_clipboard():
                 #   auto_paste_button.config(text="Enable Auto Paste & Execute")
         print("Clipboard Listening...")
         
-
-
 def process_python_prompt_Analyse_S2():
     print("process_python_prompt_Analyse_S2 started. Starting new options.")
     plot_types = [

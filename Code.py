@@ -47,7 +47,7 @@ def save_and_run_python_code():
     listening_clipboard_previous_status = False
     print("def save_and_run_python_code started.")
     update_result_text("", tk.DISABLED)
-    global last_code, run_code, running_process, listening_clipboard
+    global last_code, running_process, listening_clipboard
     print(f"Inside function: listening_clipboard = {listening_clipboard}, listening_clipboard_previous_status = {listening_clipboard_previous_status}")
     listening_clipboard_previous_status = listening_clipboard
     print(f"Listening Clipboard status: {listening_clipboard}")

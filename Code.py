@@ -47,7 +47,7 @@ def save_and_run_python_code():
     listening_clipboard_previous_status = False
     print("def save_and_run_python_code started.")
     update_result_text("", tk.DISABLED)
-    global last_code, running_process, listening_clipboard
+    global last_code, run_code, running_process, listening_clipboard
     print(f"Inside function: listening_clipboard = {listening_clipboard}, listening_clipboard_previous_status = {listening_clipboard_previous_status}")
     listening_clipboard_previous_status = listening_clipboard
     print(f"Listening Clipboard status: {listening_clipboard}")
@@ -65,8 +65,7 @@ def save_and_run_python_code():
     with open('guiscript.py', 'w') as file:
         file.write(code)
         print("writed code to guiscript.txt")
-
-        # Check if code starts with 'pip install'
+         # Check if code starts with 'pip install'
         if code.strip().startswith('pip install'):
             print("pip install detected")
             # Save it as '_recordpippackage.txt'
@@ -90,18 +89,24 @@ def save_and_run_python_code():
                 update_status_pip_success = f"Successfully installed {package_name}..:\n{status_update_pip_install.stdout}\n\n"
                 result_text.config(state=tk.NORMAL)
                 result_text.insert(tk.END, update_status_pip_success)
+                root.clipboard_clear()
+                root.clipboard_append(update_status_pip_success)
 
             except subprocess.CalledProcessError as e:
                 print(f"-- Failed to install {package_name}: {e} --")
-                update_status_pip_failed = f"Failed to install {package_name}..::\n{e}\n\n"
+                update_status_pip_failed = f"Failed to install {package_name}:{e}"
                 result_text.config(state=tk.NORMAL)
                 result_text.insert(tk.END, update_status_pip_failed)
+                root.clipboard_clear()
+                root.clipboard_append(update_status_pip_failed)
 
             if os.path.exists('_recordpippackage.txt'):
                 os.remove('_recordpippackage.txt')
                 print(f"Removed _recordpippackage.txt\n")
-                listening_clipboard = False
                 auto_paste_button_off()
+                if listening_clipboard_previous_status:
+                    listening_clipboard = True
+                    auto_paste_button_on()
                 return
             
         # Check if code starts with 'pip uninstall'    
@@ -120,21 +125,27 @@ def save_and_run_python_code():
                 result_text.config(state=tk.NORMAL)
                 # status_update_pip_uninstall = subprocess.run(pip_uninstall_command, check=True, stdout=subprocess.PIPE, text=True)
                 print(f"-- Successfully uninstalled {package_name} -- \n{status_update_pip_uninstall.stdout}")
-                update_status_pip_success = f"{status_update_pip_uninstall.stdout}"
+                update_status_unpip_success = f"{status_update_pip_uninstall.stdout}"
                 result_text.config(state=tk.NORMAL)
-                result_text.insert(tk.END, update_status_pip_success)
+                result_text.insert(tk.END, update_status_unpip_success)
+                root.clipboard_clear()
+                root.clipboard_append(update_status_unpip_success)
 
             except subprocess.CalledProcessError as e:
                 print(f"-- Failed to uninstall {package_name}: {e} --")
                 update_status_pip_failed = f"Failed to uninstall {package_name}::\n{e}"
                 result_text.config(state=tk.NORMAL)
                 result_text.insert(tk.END, update_status_pip_failed)
+                root.clipboard_clear()
+                root.clipboard_append(update_status_pip_failed)
 
             if os.path.exists('_recordpippackage.txt'):
                 os.remove('_recordpippackage.txt')
                 print(f"Removed _recordpippackage.txt\n")
-                listening_clipboard = False
                 auto_paste_button_off()
+                if listening_clipboard_previous_status:
+                    listening_clipboard =True
+                    auto_paste_button_on()
                 return
             
         else:
@@ -176,13 +187,11 @@ def save_and_run_python_code():
                     root.clipboard_append(result_text.get("1.0", tk.END))
                     root.update()
                     if listening_clipboard_previous_status:
-                        for _ in range(7):
-                            pyautogui.press('tab')
-                            time.sleep(0.3)
+                        time.sleep(2)
                         root.after(500, lambda: pyautogui.hotkey('ctrl', 'v'))
-                        time.sleep(1)
+                        time.sleep(0.3)
                         root.after(500, lambda: pyautogui.press('enter'))
-                        time.sleep(3)
+                        time.sleep(0.1)
                         auto_paste_button_on()
                         listening_clipboard_loop()
                         print(f"Listening Clipboard status: {listening_clipboard}")
@@ -369,7 +378,7 @@ def check_clipboard():
     global clipboard_content  # Add this line to access clipboard_content
     if listening_clipboard:
         new_content = root.clipboard_get()
-        if new_content != clipboard_content and ('import' in new_content or 'pip install' in new_content):
+        if new_content != clipboard_content and ('import' in new_content or 'pip install' in new_content) and ('Traceback' not in new_content or 'ModuleNotFoundError' not in new_content):
             print("Checking and comparing clipboard content.")
             clipboard_content = new_content
             code_entry.delete("1.0", tk.END)
@@ -495,7 +504,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button.pack()
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.3.6 (debug mode)")
+root.title("Python Code Runner Lite v1.3.7 (debug mode)")
 print("Creating form.")
 
 menu_bar = Menu(root)

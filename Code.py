@@ -187,11 +187,20 @@ def save_and_run_python_code():
                     root.clipboard_append(result_text.get("1.0", tk.END))
                     root.update()
                     if listening_clipboard_previous_status:
-                        time.sleep(2)
-                        root.after(500, lambda: pyautogui.hotkey('ctrl', 'v'))
+                        chatgpt_send_msg = pyautogui.locateCenterOnScreen("a_sendmsg.png", confidence=0.8)
+                        pyautogui.moveTo(chatgpt_send_msg)
+                        pyautogui.click()
                         time.sleep(0.3)
-                        root.after(500, lambda: pyautogui.press('enter'))
-                        time.sleep(0.1)
+                        root.after(500, lambda: pyautogui.hotkey('ctrl', 'v'))
+                        time.sleep(1)
+                        chatgpt_entry = pyautogui.locateCenterOnScreen("a_chatgptarrow.png", confidence=0.8)
+                        pyautogui.moveTo(chatgpt_entry)
+                        pyautogui.click()
+                        time.sleep(0.3)
+                        chatgpt_arrow_down = pyautogui.locateCenterOnScreen("a_arrowdown.png", confidence=0.9)
+                        pyautogui.moveTo(chatgpt_arrow_down)
+                        pyautogui.click()
+                        time.sleep(0.3)
                         auto_paste_button_on()
                         listening_clipboard_loop()
                         print(f"Listening Clipboard status: {listening_clipboard}")
@@ -255,6 +264,7 @@ def insert_code_into_entry(code):
     code_entry.delete("1.0", tk.END)
     code_entry.insert(tk.END, code)
     update_result_text("Copy above python prompt into ChatGPT\n", tk.DISABLED)
+    highlight_code()
     print("Completed/n")
 
 def process_chain_of_thought():
@@ -504,7 +514,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button.pack()
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.3.7 (debug mode)")
+root.title("Python Code Runner Lite v1.3.8 (debug mode)")
 print("Creating form.")
 
 menu_bar = Menu(root)

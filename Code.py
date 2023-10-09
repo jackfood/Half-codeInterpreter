@@ -187,7 +187,7 @@ def save_and_run_python_code():
                         if listening_clipboard_previous_status:
                             auto_paste_button_on()
                             listening_clipboard_loop()
-                            print("Resume Clipboard Listening - Code 1")
+                            print("Resume Clipboard Listening - Code 1, Auto listening ON")
                         break
                     if output:
                         print(f"{output}")
@@ -204,9 +204,7 @@ def save_and_run_python_code():
                     root.update()
                     if listening_clipboard_previous_status:
                         web_chatgpt_autoclick()
-                        auto_paste_button_on()
-                        listening_clipboard_loop()
-                        print(f"Listening Clipboard status: {listening_clipboard}")
+                        print(f"AutoPaste to Web ChatGPT activated")
 
             update_result_thread = threading.Thread(target=update_result)
             update_result_thread.start()

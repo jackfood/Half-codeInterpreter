@@ -192,7 +192,12 @@ def save_and_run_python_code():
                         if listening_clipboard_previous_status:
                             auto_paste_button_on()
                             listening_clipboard_loop()
-                            print("def update_result - BREAK")
+                            root.clipboard_clear()
+                            root.clipboard_append(result_text.get("1.0", tk.END))
+                            root.update()
+                            print("def update_result - output empty and running_process.poll is not None - Clipboard updated")
+                            web_chatgpt_autoclick()
+                            print("def update_result - output empty and running_process.poll is not None - BREAK")
                         break
                     if output:
                         print(f"{output}")
@@ -205,7 +210,7 @@ def save_and_run_python_code():
                         if 'error' in output.lower():
                             error_found = True
                             print("def update_result - Error True")
-                    time.sleep(0.05)
+                    time.sleep(0.10)
 
                 # Move clipboard copy logic outside the loop
                 root.clipboard_clear()
@@ -218,8 +223,14 @@ def save_and_run_python_code():
                     web_chatgpt_autoclick()
                     print(f"AutoPaste to Web ChatGPT activated")
                 else:
-                    print(f"Enabled button - no auto listening")
-                    auto_paste_button_off()
+                    print("def update_result - error_found and listening_clipboard_previous_status")
+                    auto_paste_button_on()
+                    listening_clipboard_loop()
+                    print(f"AutoPaste to Web ChatGPT activated")
+
+          # if cancel auto listening if there is no error
+          #          print(f"Enabled button - no auto listening")
+          #          auto_paste_button_off()
 
             update_result_thread = threading.Thread(target=update_result)
             update_result_thread.start()

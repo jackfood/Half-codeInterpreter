@@ -190,20 +190,13 @@ def save_and_run_python_code():
                     output = running_process.stdout.readline()
                     if output == '' and running_process.poll() is not None:
                         if listening_clipboard_previous_status:
-                            # auto_paste_button_on()
                             listening_clipboard_loop()
-                            # root.clipboard_clear()
-                            # root.clipboard_append(result_text.get("1.0", tk.END))
-                            # root.update()
                             print("def update_result - output empty and running_process.poll is not None - listening True - BREAK")
                         break
                     if output:
                         print(f"{output}")
                         result_text.config(state=tk.NORMAL)
                         result_text.insert(tk.END, output)
-                        #root.clipboard_clear()
-                        #root.clipboard_append(result_text.get("1.0", tk.END))
-                        #root.update()
                         print("def update_result - output updated")
                         if 'error' in output.lower():
                             error_found = True
@@ -236,7 +229,6 @@ def save_and_run_python_code():
                         print(f"AutoPaste to Web ChatGPT activated")
                         auto_paste_button_on()
                         listening_clipboard_loop()
-                        print(f"AutoPaste to Web ChatGPT activated")
                     else:
                         auto_paste_button_off()
 
@@ -253,10 +245,6 @@ def save_and_run_python_code():
                         listening_clipboard_loop()
                     else:
                         auto_paste_button_off()
-
-          # if cancel auto listening if there is no error
-          #          print(f"Enabled button - no auto listening")
-          #          auto_paste_button_off()
 
             update_result_thread = threading.Thread(target=update_result)
             update_result_thread.start()
@@ -312,7 +300,6 @@ Save to directory if needed: {output_location}'''
     update_result_text("Copy above python prompt into ChatGPT\n", tk.DISABLED)
     print("Completed/n")
 
-# Add insert code function ####################
 def insert_code_into_entry(code):
     print("def insert_code_into_entry")
     code_entry.delete("1.0", tk.END)

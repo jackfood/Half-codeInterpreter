@@ -190,14 +190,12 @@ def save_and_run_python_code():
                     output = running_process.stdout.readline()
                     if output == '' and running_process.poll() is not None:
                         if listening_clipboard_previous_status:
-                            auto_paste_button_on()
+                            # auto_paste_button_on()
                             listening_clipboard_loop()
-                            root.clipboard_clear()
-                            root.clipboard_append(result_text.get("1.0", tk.END))
-                            root.update()
-                            print("def update_result - output empty and running_process.poll is not None - Clipboard updated")
-                            web_chatgpt_autoclick()
-                            print("def update_result - output empty and running_process.poll is not None - BREAK")
+                            # root.clipboard_clear()
+                            # root.clipboard_append(result_text.get("1.0", tk.END))
+                            # root.update()
+                            print("def update_result - output empty and running_process.poll is not None - listening True - BREAK")
                         break
                     if output:
                         print(f"{output}")
@@ -206,39 +204,55 @@ def save_and_run_python_code():
                         #root.clipboard_clear()
                         #root.clipboard_append(result_text.get("1.0", tk.END))
                         #root.update()
-                        print("def update_result - output update")
+                        print("def update_result - output updated")
                         if 'error' in output.lower():
                             error_found = True
                             print("def update_result - Error True")
                     time.sleep(0.10)
 
-                if error_found and listening_clipboard_previous_status:
+                if error_found:
                     root.clipboard_clear()
                     root.clipboard_append(result_text.get("1.0", tk.END))
                     print(result_text.get("1.0", tk.END))
                     root.update()
                     print("def update_result - error_found and listening_clipboard_previous_status")
-                    web_chatgpt_autoclick()
-                    print(f"AutoPaste to Web ChatGPT activated")
-                elif result_text.get("1.0", tk.END).strip() == "":
-                    print("def update_result - python ran but result_text is empty")
+                    if listening_clipboard_previous_status:
+                        web_chatgpt_autoclick()
+                        print(f"AutoPaste to Web ChatGPT activated")
+                    else:
+                        auto_paste_button_off()
+
+                elif result_text.get("1.0", tk.END).strip() == "Python..." or not result_text.get("1.0", tk.END).strip():
                     status_in_clipboard_success = "Python Executed Successfully"
+                    result_text.delete("1.0", tk.END)
+                    result_text.insert(tk.END, status_in_clipboard_success)
+                    print("def update_result - python ran but result_text is empty")
                     root.clipboard_clear()
-                    root.clipboard_append(status_in_clipboard_success)
+                    root.clipboard_append(result_text.get("1.0", tk.END))
                     print("def update_result - Clipboard updated as Python Executed Successfully")
-                    root.update()  # Move this line here
-                    auto_paste_button_on()
-                    listening_clipboard_loop()
-                    print(f"AutoPaste to Web ChatGPT activated")
+                    root.update()
+                    if listening_clipboard_previous_status:
+                        web_chatgpt_autoclick()
+                        print(f"AutoPaste to Web ChatGPT activated")
+                        auto_paste_button_on()
+                        listening_clipboard_loop()
+                        print(f"AutoPaste to Web ChatGPT activated")
+                    else:
+                        auto_paste_button_off()
+
                 else:
                     root.clipboard_clear()
                     root.clipboard_append(result_text.get("1.0", tk.END))
                     print(result_text.get("1.0", tk.END))
                     root.update()
-                    print("def update_result - Clipboard updated as Python Executed Sucessfully")
-                    auto_paste_button_on()
-                    listening_clipboard_loop()
-                    print(f"AutoPaste to Web ChatGPT activated")
+                    if listening_clipboard_previous_status:
+                        web_chatgpt_autoclick()
+                        print("def update_result - Clipboard updated as Python Executed Sucessfully")
+                        print(f"AutoPaste to Web ChatGPT activated")
+                        auto_paste_button_on()
+                        listening_clipboard_loop()
+                    else:
+                        auto_paste_button_off()
 
           # if cancel auto listening if there is no error
           #          print(f"Enabled button - no auto listening")
@@ -560,7 +574,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button.pack()
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.3.9.1 (debug mode)")
+root.title("Python Code Runner Lite v1.4 (debug mode)")
 print("Creating form.")
 
 menu_bar = Menu(root)

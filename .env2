@@ -285,7 +285,7 @@ class ImageAnalyzerGUI:
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "Describe the image " + prompt},
+                        {"type": "text", "text": prompt},
                         {
                             "type": "image_url",
                             "image_url": {

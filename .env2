@@ -221,3 +221,98 @@ elif file_path.endswith(".csv"):
 else:
     print("Unsupported file format. Please provide a CSV or Excel file.")
 '''
+
+
+
+vision_lmstudio = '''
+import base64
+from tkinter import Tk, Label, Entry, Button, Text, filedialog
+from openai import OpenAI
+import requests
+
+class ImageAnalyzerGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Image Analyzer")
+
+        # GUI components
+        self.label = Label(root, text="Select Image:")
+        self.label.pack()
+
+        self.select_button = Button(root, text="Browse", command=self.browse_image)
+        self.select_button.pack()
+
+        self.prompt_label = Label(root, text="Enter Prompt:")
+        self.prompt_label.pack()
+
+        self.prompt_entry = Entry(root, width=60)
+        self.prompt_entry.insert(0, "Describe the image in detail.")
+        self.prompt_entry.pack()
+
+        self.analyze_button = Button(root, text="Analyze", command=self.process_image)
+        self.analyze_button.pack()
+
+        self.result_text = Text(root, height=10, width=50)
+        self.result_text.pack()
+
+    def browse_image(self):
+        file_path = filedialog.askopenfilename(title="Select Image", filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
+        self.image_path = file_path
+        self.label.config(text=f"Selected Image: {file_path}")
+
+    def get_base_64_img(self, image):
+        if "http" not in image:
+            base64_image = base64.b64encode(open(image, "rb").read()).decode('utf-8')
+        else:
+            response = requests.get(image)
+            base64_image = base64.b64encode(response.content).decode('utf-8')
+        return base64_image
+
+    def process_image(self):
+        if not hasattr(self, 'image_path'):
+            self.result_text.delete(1.0, "end")
+            self.result_text.insert("end", "Please select an image first.")
+            return
+
+        prompt = self.prompt_entry.get()
+
+        base64_image = self.get_base_64_img(self.image_path)
+
+        completion = client.chat.completions.create(
+            model="local-model",
+            temperature=0,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Describe the image " + prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_image}"
+                            },
+                        },
+                    ],
+                }
+            ],
+            max_tokens=2000,
+            stream=True
+        )
+
+        result_text = ""
+        for chunk in completion:
+            if chunk.choices[0].delta.content:
+                result_text += chunk.choices[0].delta.content
+
+        self.result_text.delete(1.0, "end")
+        self.result_text.insert("end", result_text)
+
+if __name__ == "__main__":
+    # Set up OpenAI client
+    client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
+
+    # Create and run the GUI
+    root = Tk()
+    app = ImageAnalyzerGUI(root)
+    root.mainloop()
+'''

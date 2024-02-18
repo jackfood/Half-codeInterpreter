@@ -229,6 +229,7 @@ import base64
 from tkinter import Tk, Label, Entry, Button, Text, filedialog
 from openai import OpenAI
 import requests
+import textwrap  # Import the textwrap module
 
 class ImageAnalyzerGUI:
     def __init__(self, root):
@@ -252,7 +253,7 @@ class ImageAnalyzerGUI:
         self.analyze_button = Button(root, text="Analyze", command=self.process_image)
         self.analyze_button.pack()
 
-        self.result_text = Text(root, height=10, width=50)
+        self.result_text = Text(root, height=10, width=50, wrap="none")  # Set wrap to "none"
         self.result_text.pack()
 
     def browse_image(self):
@@ -304,6 +305,9 @@ class ImageAnalyzerGUI:
             if chunk.choices[0].delta.content:
                 result_text += chunk.choices[0].delta.content
 
+        # Use textwrap to break lines at word boundaries
+        result_text = textwrap.fill(result_text, width=50)
+        
         self.result_text.delete(1.0, "end")
         self.result_text.insert("end", result_text)
 

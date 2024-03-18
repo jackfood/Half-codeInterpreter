@@ -66,18 +66,10 @@ def web_chatgpt_autoclick():
 
 def save_and_run_python_code():
     print("def save_and_run_python_code")
-    listening_clipboard_previous_status = False
     update_result_text("", tk.DISABLED)
-    global last_code, running_process, listening_clipboard
-    print(f"Inside function: listening_clipboard = {listening_clipboard}, listening_clipboard_previous_status = {listening_clipboard_previous_status}")
-    listening_clipboard_previous_status = listening_clipboard
-    print(f"Listening Clipboard status: {listening_clipboard}")
-    print(f"Listening Clipboard Previous status: {listening_clipboard_previous_status}")
-    auto_paste_button_disabled()
+    global last_code, running_process
     code = code_entry.get("1.0", "end-1c")
     last_code = code
-
-    print(f"After function: listening_clipboard = {listening_clipboard}, listening_clipboard_previous_status = {listening_clipboard_previous_status}")
 
     if running_process and running_process.poll() is None:
         running_process.kill()
@@ -124,10 +116,6 @@ def save_and_run_python_code():
             if os.path.exists('_recordpippackage.txt'):
                 os.remove('_recordpippackage.txt')
                 print(f"Removed _recordpippackage.txt\n")
-                auto_paste_button_off()
-                if listening_clipboard_previous_status:
-                    listening_clipboard = True
-                    auto_paste_button_on()
                 return
             
         # Check if code starts with 'pip uninstall'    
@@ -163,10 +151,6 @@ def save_and_run_python_code():
             if os.path.exists('_recordpippackage.txt'):
                 os.remove('_recordpippackage.txt')
                 print(f"Removed _recordpippackage.txt\n")
-                auto_paste_button_off()
-                if listening_clipboard_previous_status:
-                    listening_clipboard =True
-                    auto_paste_button_on()
                 return
             
         else:
@@ -190,9 +174,6 @@ def save_and_run_python_code():
                 while True:
                     output = running_process.stdout.readline()
                     if output == '' and running_process.poll() is not None:
-                        if listening_clipboard_previous_status:
-                            listening_clipboard_loop()
-                            print("def update_result - output empty and running_process.poll is not None - listening True - BREAK")
                         break
                     if output:
                         print(f"{output}")
@@ -209,12 +190,6 @@ def save_and_run_python_code():
                     root.clipboard_append(result_text.get("1.0", tk.END))
                     print(result_text.get("1.0", tk.END))
                     root.update()
-                    print("def update_result - error_found and listening_clipboard_previous_status")
-                    if listening_clipboard_previous_status:
-                        web_chatgpt_autoclick()
-                        print(f"AutoPaste to Web ChatGPT activated")
-                    else:
-                        auto_paste_button_off()
 
                 elif result_text.get("1.0", tk.END).strip() == "Python..." or not result_text.get("1.0", tk.END).strip():
                     status_in_clipboard_success = "Python Executed Successfully"
@@ -225,27 +200,12 @@ def save_and_run_python_code():
                     root.clipboard_append(result_text.get("1.0", tk.END))
                     print("def update_result - Clipboard updated as Python Executed Successfully")
                     root.update()
-                    if listening_clipboard_previous_status:
-                        web_chatgpt_autoclick()
-                        print(f"AutoPaste to Web ChatGPT activated")
-                        auto_paste_button_on()
-                        listening_clipboard_loop()
-                    else:
-                        auto_paste_button_off()
 
                 else:
                     root.clipboard_clear()
                     root.clipboard_append(result_text.get("1.0", tk.END))
                     print(result_text.get("1.0", tk.END))
                     root.update()
-                    if listening_clipboard_previous_status:
-                        web_chatgpt_autoclick()
-                        print("def update_result - Clipboard updated as Python Executed Sucessfully")
-                        print(f"AutoPaste to Web ChatGPT activated")
-                        auto_paste_button_on()
-                        listening_clipboard_loop()
-                    else:
-                        auto_paste_button_off()
 
             update_result_thread = threading.Thread(target=update_result)
             update_result_thread.start()
@@ -369,6 +329,7 @@ def cohesion_and_engagement_improver():
     code = f'''{cohesion_and_engagement_improver_prompt}'''
     insert_code_into_entry(code)
     print("cohesion_and_engagement_improver selected")
+
 def professional_writer():
     code = f'''{professional_writer_prompt}'''
     insert_code_into_entry(code)
@@ -393,67 +354,6 @@ file_path = r"{input_location_2}"
     save_and_run_python_code()
     print("process_python_prompt_Analyse_S1 running code")
 
-def auto_paste_button_on():
-    print("def auto_paste_button_on")
-    global listening_clipboard
-    auto_paste_button.config(text="Disable Auto Paste & Execute", state="normal")
-    listening_clipboard = True
-    print("auto_paste - On")
-
-def auto_paste_button_off():
-    print("def auto_paste_button_off")
-    global listening_clipboard
-    auto_paste_button.config(text="Enable Auto Paste & Execute", state="normal")
-    listening_clipboard = False
-    print("auto_paste - Off")
-
-def auto_paste_button_disabled():
-    print("def auto_paste_button_disabled")
-    global listening_clipboard
-    auto_paste_button.config(text="Disabled - python running", state="disabled")
-    listening_clipboard = False
-    print("auto_paste - Off")
-
-clipboard_content = ""
-
-def auto_paste_and_execute():
-    print("def auto_paste_and_execute")
-    global listening_clipboard
-    global clipboard_content  # Add this line to access clipboard_content
-    print(f"listening_clipboard status: {listening_clipboard}")
-    listening_clipboard = not listening_clipboard
-    listening_clipboard_loop()
-    
-def listening_clipboard_loop():
-    print("def listening_clipboard_loop")
-    if listening_clipboard:
-        auto_paste_button_on()
-        check_clipboard()
-        root.after(1000, listening_clipboard_loop)
-    else:
-        auto_paste_button_off()
-        return
-
-def check_clipboard():
-    print("def check_clipboard")
-    global listening_clipboard
-    global clipboard_content  # Add this line to access clipboard_content
-    if listening_clipboard:
-        new_content = root.clipboard_get()
-        if new_content != clipboard_content and ('import' in new_content or 'pip install' in new_content) and ('Traceback' not in new_content or 'ModuleNotFoundError' not in new_content):
-            print("Checking and comparing clipboard content.")
-            clipboard_content = new_content
-            code_entry.delete("1.0", tk.END)
-            code_entry.insert(tk.END, clipboard_content)
-            save_and_run_python_code()
-            print("Python Code Run")
-
-# doing trial to disable this function
-              # if 'import matplotlib' in clipboard_content:
-                #   listening_clipboard = False
-                #   auto_paste_button.config(text="Enable Auto Paste & Execute")
-        print("Clipboard Listening...")
-        
 def process_python_prompt_Analyse_S2():
     print("process_python_prompt_Analyse_S2 started. Starting new options.")
     plot_types = [
@@ -488,7 +388,6 @@ def process_python_prompt_Analyse_S2():
         "logit chart",
         "subplot chart"
     ]
-
 
     colour_type = [
         "Appropriate colours",
@@ -566,7 +465,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button.pack()
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.5)")
+root.title("Python Code Runner Lite v1.6")
 print("Creating form.")
 
 menu_bar = Menu(root)
@@ -592,13 +491,12 @@ gpt_prompt_menu.add_command(label="Summarise Text", command=summarise_text)
 gpt_prompt_menu.add_command(label="AI writing assistant", command=ai_writing_assistant)
 gpt_prompt_menu.add_command(label="Unrestricted Opinion Prompt", command=unrestricted_opinion)
 gpt_prompt_menu.add_command(label="Flow and Cohesion of Sentence Improver", command=cohesion_and_engagement_improver)
-gpt_prompt_menu.add_command(label="Professional Writer", command=professional_writer )
+gpt_prompt_menu.add_command(label="Professional Writer", command=professional_writer)
 # gpt_prompt_menu.add_command(label="Image Vision Analyser - LMstudio", command=vision_lmstudio)
 # gpt_prompt_menu.add_command(label="", command=)
 # gpt_prompt_menu.add_command(label="", command=)
 # gpt_prompt_menu.add_command(label="", command=)
 # gpt_prompt_menu.add_command(label="", command=)
-
 
 # Create and configure menu
 python_prompt_menu = Menu(menu_bar)
@@ -623,9 +521,6 @@ code_entry.pack(fill=tk.BOTH, expand=True)
 
 save_and_run_button = tk.Button(root, text="Run Code", command=save_and_run_python_code)
 save_and_run_button.pack()
-
-auto_paste_button = tk.Button(root, text="Enable Auto Paste & Execute", command=auto_paste_and_execute)
-auto_paste_button.pack()
 
 result_text = scrolledtext.ScrolledText(root, height=10, width=40, bg="black", fg="white")
 result_text.pack(fill=tk.BOTH, expand=True)

@@ -8,7 +8,6 @@ import pyautogui
 
 running_process = None
 last_code = None
-listening_clipboard = False
 print("auto_paste - Off")
 
 # Load environment variables from .env2 file
@@ -102,16 +101,12 @@ def save_and_run_python_code():
                 update_status_pip_success = f"Successfully installed {package_name}..:\n{status_update_pip_install.stdout}\n\n"
                 result_text.config(state=tk.NORMAL)
                 result_text.insert(tk.END, update_status_pip_success)
-                root.clipboard_clear()
-                root.clipboard_append(update_status_pip_success)
 
             except subprocess.CalledProcessError as e:
                 print(f"-- Failed to install {package_name}: {e} --")
                 update_status_pip_failed = f"Failed to install {package_name}:{e}"
                 result_text.config(state=tk.NORMAL)
                 result_text.insert(tk.END, update_status_pip_failed)
-                root.clipboard_clear()
-                root.clipboard_append(update_status_pip_failed)
 
             if os.path.exists('_recordpippackage.txt'):
                 os.remove('_recordpippackage.txt')
@@ -137,16 +132,12 @@ def save_and_run_python_code():
                 update_status_unpip_success = f"{status_update_pip_uninstall.stdout}"
                 result_text.config(state=tk.NORMAL)
                 result_text.insert(tk.END, update_status_unpip_success)
-                root.clipboard_clear()
-                root.clipboard_append(update_status_unpip_success)
 
             except subprocess.CalledProcessError as e:
                 print(f"-- Failed to uninstall {package_name}: {e} --")
                 update_status_pip_failed = f"Failed to uninstall {package_name}::\n{e}"
                 result_text.config(state=tk.NORMAL)
                 result_text.insert(tk.END, update_status_pip_failed)
-                root.clipboard_clear()
-                root.clipboard_append(update_status_pip_failed)
 
             if os.path.exists('_recordpippackage.txt'):
                 os.remove('_recordpippackage.txt')
@@ -158,7 +149,7 @@ def save_and_run_python_code():
             command = ["python", "guiscript.py"]
             print(f"Activate command python.txt")
 
-            update_status_py = "Python..."
+            update_status_py = "-"
             print("Running Python...")
             running_process = subprocess.Popen(
                 command, cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
@@ -186,24 +177,17 @@ def save_and_run_python_code():
                     time.sleep(0.10)
 
                 if error_found:
-                    root.clipboard_clear()
-                    root.clipboard_append(result_text.get("1.0", tk.END))
                     print(result_text.get("1.0", tk.END))
                     root.update()
 
                 elif result_text.get("1.0", tk.END).strip() == "Python..." or not result_text.get("1.0", tk.END).strip():
-                    status_in_clipboard_success = "Python Executed Successfully"
                     result_text.delete("1.0", tk.END)
-                    result_text.insert(tk.END, status_in_clipboard_success)
                     print("def update_result - python ran but result_text is empty")
-                    root.clipboard_clear()
-                    root.clipboard_append(result_text.get("1.0", tk.END))
                     print("def update_result - Clipboard updated as Python Executed Successfully")
                     root.update()
 
                 else:
                     root.clipboard_clear()
-                    root.clipboard_append(result_text.get("1.0", tk.END))
                     print(result_text.get("1.0", tk.END))
                     root.update()
 

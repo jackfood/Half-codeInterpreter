@@ -383,7 +383,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button.pack()
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.6.3 (GUI Updated)")
+root.title("Python Code Runner Lite v1.6.3 (GUI Update)")
 root.geometry("900x700")
 print("Creating form.")
 

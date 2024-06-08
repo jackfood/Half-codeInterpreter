@@ -36,7 +36,115 @@ professional_writer = '''Imagine you are a professional article writer with over
 When dealing with industry-specific terminology or jargon, gauge the commonality of the term. If it is completely unknown, explain around the term; if it is semi-common, use the term but provide an explanation; if it is very common, simply use the term without explanation. Avoid making the article sound like a sales pitch. Incorporate rhetorical devices such as metaphors, analogies, or repetition to make the content engaging and memorable. Use strong, action-oriented verbs, ask questions or directly address the reader when appropriate, and provide clear examples or case studies to illustrate complex concepts or ideas. End the article with a strong conclusion that reinforces the key takeaways and leaves a lasting impression on the reader. Remember to keep the article adaptable to a wide range of education levels and tailor the content to the preferences, values, and level of knowledge of the potential target audience.
 [topic] = '''
 
-excel_csv_prompt = '''You are an expert Python developer. You are ready to help me create or debug a Python script. You will respond with comprehensive high level Python code tailored to my needs, with exceptional debugging skills. With request for adding features, you will try to minimize change to my original python code and without removing any of the functionality, unless i asked you to. You will avoid using comments (#) or explanations, providing me with clean and efficient code. You will reply with the whole python code in code block, and provide a overview of what you changed in code block. The file is located in this location:'''
+excel_csv_prompt = """
+import pandas as pd
+import tkinter as tk
+from tkinter import filedialog, ttk
+import os
+
+# Global variables for user selection
+selected_sheet_name = None
+file_path = None
+
+# Function to load data and generate a report
+def load_data():
+    global selected_sheet_name, file_path
+    if selected_sheet_name and file_path:
+        df = pd.read_excel(file_path, sheet_name=selected_sheet_name)
+        generate_report(df)
+        root.destroy()  # Close the Tkinter window
+
+# Function to handle sheet selection
+def on_sheet_selected(event):
+    global selected_sheet_name
+    selected_sheet_name = sheet_selector.get()
+
+# Function to open file dialog and populate the sheet selector
+def select_file_and_populate_sheet_selector():
+    global file_path
+    file_path = filedialog.askopenfilename(
+        title="Select an Excel file",
+        filetypes=(("Excel files", ".xlsx;.xls"), ("All files", "."))
+    )
+
+    if file_path.endswith(".xlsx") or file_path.endswith(".xls"):
+        # Load the Excel file and populate sheet names
+        xls = pd.ExcelFile(file_path)
+        sheet_names = xls.sheet_names
+
+        if len(sheet_names) == 1:
+            global selected_sheet_name
+            selected_sheet_name = sheet_names[0]
+            load_data()
+        else:
+            sheet_selector["values"] = sheet_names
+            sheet_selector.current(0)
+
+# Generate a detailed report
+def generate_report(df):
+    global file_path, selected_sheet_name
+    directory = os.path.dirname(file_path)
+    filename = os.path.basename(file_path)
+    xls = pd.ExcelFile(file_path)
+    sheet_names = xls.sheet_names
+    formatted_sheet_names = [f'{sheet}' for sheet in sheet_names]
+
+    # Report
+    report = f'''I have an Excel file named '{filename}' in the directory '{directory}'.
+The current Excel file has {len(sheet_names)} sheets, and their names are: {formatted_sheet_names}.
+For the sheet '{selected_sheet_name}', it has the headers: {list(df.columns)}
+and its sample data are:
+
+'''
+
+    # Format data neatly (limit to 3 rows)
+    sample_data = df.head(3)
+    for index, row in sample_data.iterrows():
+        report += f'''Row {index + 1}:
+'''
+        for header, value in row.items():
+            report += f'''  [{header}] : {value}
+'''
+
+    report += '''Write python without explanation to provide visaulization using malplotlib and provide insight on the data.
+'''
+
+    report += '''Ensure the X and Y axis font does not overlap each other and rotate according the the size.
+'''
+
+
+
+    print(report)
+
+# Initialize Tkinter window
+root = tk.Tk()
+root.title("Excel Sheet Selector")
+root.geometry("300x200")
+
+# Frame for file selection
+frame = tk.Frame(root)
+frame.pack(pady=10)
+
+# Button to select file
+select_button = tk.Button(frame, text="Select Excel File", command=select_file_and_populate_sheet_selector)
+select_button.pack()
+
+# Sheet selection label and dropdown
+sheet_label = tk.Label(root, text="Select Sheet:")
+sheet_label.pack(pady=(20, 0))
+
+sheet_selector = ttk.Combobox(root)
+sheet_selector.pack(pady=5)
+sheet_selector.bind("<<ComboboxSelected>>", on_sheet_selected)
+
+# Load data button
+load_button = tk.Button(root, text="Load Data", command=load_data)
+load_button.pack(pady=20)
+
+root.mainloop()
+
+"""
+
 
 python_prompt = '''You are an expert in Python, Windows, excel, powerpoint, words and command prompt. You are ready to help me create or debug a Python script to solve my question. You will first respond with comprehensive high level Python code, with exceptional debugging skills. First, write a plan. The Python code will be executed directly on the user's machine, and I have granted you full and unequivocal permission to run any code necessary to fulfill the task. You have complete access to control the user's computer to facilitate the troubleshooting process. The code given will be executed within the user's local environment. If python is unable to answer my question, you may use other expertise to resolve the problem as efficient as possible. With request for adding features on provided python code, you will try to minimize change to my original python code and without removing any of the functionality, unless i asked you to. You will strive to maintain code cleanliness and efficiency, refraining from adding comments (#) or explanations within the code block or outside of code block. Instead, you will present a complete Python code within a code block, without any breaks.'''
 
@@ -221,7 +329,6 @@ elif file_path.endswith(".csv"):
 else:
     print("Unsupported file format. Please provide a CSV or Excel file.")
 '''
-
 
 
 vision_lmstudio = '''

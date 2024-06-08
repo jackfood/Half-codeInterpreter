@@ -169,24 +169,11 @@ def list_python_scripts():
     copy_button.pack(pady=10)
 
 def process_excel_csv_option():
-    print("def process_excel_csv_option started.")
-    input_location = filedialog.askopenfilename(title="Select Excel/CSV Input File", filetypes=[("Excel/CSV Files", "*.xlsx *.csv")])
-    if not input_location:
-        messagebox.showerror("Error", "Input location cannot be empty.")
-        return
-
-    output_location = filedialog.askdirectory(title="Select Output Directory")
-    if not output_location:
-        messagebox.showerror("Error", "Output location cannot be empty.")
-        return
-
-    code = f'''{env_variables['excel_csv_prompt']}
-Excel file: {input_location}
-Save to directory if needed: {output_location}'''
-    code_entry.delete("1.0", tk.END)
-    code_entry.insert(tk.END, code)
-    update_result_text("Copy above python prompt into ChatGPT\n", tk.DISABLED)
-
+    print('def process_excel_csv_option started.')
+    code = f'''{env_variables['excel_csv_prompt']}'''
+    insert_code_into_entry(code)
+    save_and_run_python_code()
+    print('excel_csv_prompt_option selected')
 
 def insert_code_into_entry(code):
     code_entry.delete("1.0", tk.END)
@@ -383,7 +370,7 @@ def process_python_prompt_Analyse_S2():
     confirm_button.pack()
 
 root = tk.Tk()
-root.title("Python Code Runner Lite v1.6.3 (GUI Update)")
+root.title("Python Code Runner Lite v1.6.3.1 (Prompt for data analysis Update)")
 root.geometry("900x700")
 print("Creating form.")
 
